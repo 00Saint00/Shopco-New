@@ -1,4 +1,7 @@
 import { Button } from "@headlessui/react";
+import banner800 from "../../../assets/logo/banner-800.webp";
+import banner1200 from "../../../assets/logo/banner-1200.webp";
+import banner1600 from "../../../assets/logo/banner-1600.webp";
 
 function Banner() {
   return (
@@ -7,11 +10,11 @@ function Banner() {
       <picture>
         <source
           type="image/webp"
-          srcSet="/src/assets/logo/banner-800.webp 800w, /src/assets/logo/banner-1200.webp 1200w, /src/assets/logo/banner-1600.webp 1600w"
+          srcSet={`${banner800} 800w, ${banner1200} 1200w, ${banner1600} 1600w`}
           sizes="(max-width: 640px) 100vw, (max-width: 1280px) 100vw, 1600px"
         />
         <img
-          src="/src/assets/logo/banner-1600.webp"
+          src={banner1600}
           alt="Shop banner"
           className="absolute inset-0 w-full h-full object-cover pointer-events-none -z-10"
           loading="eager"

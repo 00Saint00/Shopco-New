@@ -51,38 +51,40 @@ export default defineConfig({
           if (pkg && pkg.startsWith("@") && parts.length > 1)
             pkg = `${pkg}/${parts[1]}`;
 
-          switch (pkg) {
-            case "react":
-            case "react-dom":
-            case "scheduler":
-              return "vendor-react";
-            // Keep React-related UI/runtime libs together to avoid circular import/init order issues
-            case "@gsap/react":
-            case "gsap":
-            case "@floating-ui/react":
-            case "@floating-ui/dom":
-            case "@floating-ui/core":
-            case "@popperjs/core":
-              return "vendor-react";
-            case "react-router":
-            case "react-router-dom":
-            case "@remix-run/router":
-              // Keep router packages with react to avoid circular init issues
-              return "vendor-react";
-            case "swiper":
-              return "vendor-swiper";
-            case "lucide-react":
-              return "vendor-lucide";
-            case "@headlessui/react":
-              return "vendor-headlessui";
-            case "axios":
-              return "vendor-axios";
-            case "gsap":
-            case "gsap/ScrollTrigger":
-              return "vendor-gsap";
-            default:
-              return "vendor";
+          // Core React ecosystem - must be together to avoid circular deps
+          if (
+            pkg === "react" ||
+            pkg === "react-dom" ||
+            pkg === "scheduler" ||
+            pkg === "react-router" ||
+            pkg === "react-router-dom" ||
+            pkg === "@remix-run/router" ||
+            pkg === "react-hook-form" ||
+            pkg === "@headlessui/react" ||
+            pkg === "@gsap/react" ||
+            pkg === "gsap" ||
+            pkg === "@floating-ui/react" ||
+            pkg === "@floating-ui/dom" ||
+            pkg === "@floating-ui/core" ||
+            pkg === "@popperjs/core"
+          ) {
+            return "vendor-react";
           }
+
+          // Other large packages get their own chunks
+          if (pkg === "swiper") {
+            return "vendor-swiper";
+          }
+          if (pkg === "lucide-react") {
+            return "vendor-lucide";
+          }
+          if (pkg === "axios") {
+            return "vendor-axios";
+          }
+
+          // For other packages, let Rollup decide to avoid circular deps
+          // This prevents forcing packages into vendor that might cause issues
+          return null;
         },
       },
     },
