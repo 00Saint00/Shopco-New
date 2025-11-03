@@ -253,66 +253,80 @@ const Header = () => {
 
           {user ? (
             <Menu as="div" className="relative inline-block text-left">
-              <Menu.Button className="flex items-center gap-2 focus:outline-none">
-                <img
-                  src={user.avatar}
-                  alt={user.name}
-                  className="h-[32px] w-[32px] rounded-full"
-                  loading="lazy"
-                />
-                <ChevronDown className="h-4 w-4 text-gray-500" />
-              </Menu.Button>
+              {({ open }) => (
+                <>
+                  <Menu.Button className="flex items-center gap-2 focus:outline-none">
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="h-[32px] w-[32px] rounded-full"
+                      loading="lazy"
+                    />
+                    <ChevronDown
+                      className={`h-4 w-4 text-gray-500 transition-transform duration-400 ease-out ${
+                        open ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Menu.Button>
 
-              <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
-                <div className="px-3 py-2 border-b">
-                  <p className="text-sm font-medium">{user.name}</p>
-                  <p className="text-xs text-gray-500">{user.email}</p>
-                </div>
+                  <Menu.Items
+                    className={`absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-50 transition-all duration-300 ease-out ${
+                      open
+                        ? "opacity-100 scale-100 translate-y-0"
+                        : "opacity-0 scale-95 -translate-y-2"
+                    }`}
+                  >
+                    <div className="px-3 py-2 border-b">
+                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
 
-                <Menu.Item>
-                  {({ active }) => (
-                    <Link
-                      to="/profile"
-                      className={`${
-                        active ? "bg-gray-100" : ""
-                      } flex items-center w-full px-4 py-2 text-sm text-gray-800`}
-                    >
-                      <User className="h-4 w-4 mr-2" />
-                      My Profile
-                    </Link>
-                  )}
-                </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          to="/profile"
+                          className={`${
+                            active ? "bg-gray-100" : ""
+                          } flex items-center w-full px-4 py-2 text-sm text-gray-800`}
+                        >
+                          <User className="h-4 w-4 mr-2" />
+                          My Profile
+                        </Link>
+                      )}
+                    </Menu.Item>
 
-                {user.role === "admin" && (
-                  <Menu.Item>
-                    {({ active }) => (
-                      <Link
-                        to="/dashboard"
-                        className={`${
-                          active ? "bg-gray-100" : ""
-                        } flex items-center w-full px-4 py-2 text-sm text-gray-800`}
-                      >
-                        <ClipboardCheck className="h-4 w-4 mr-2" />
-                        Dashboard
-                      </Link>
+                    {user.role === "admin" && (
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/dashboard"
+                            className={`${
+                              active ? "bg-gray-100" : ""
+                            } flex items-center w-full px-4 py-2 text-sm text-gray-800`}
+                          >
+                            <ClipboardCheck className="h-4 w-4 mr-2" />
+                            Dashboard
+                          </Link>
+                        )}
+                      </Menu.Item>
                     )}
-                  </Menu.Item>
-                )}
 
-                <Menu.Item>
-                  {({ active }) => (
-                    <Button
-                      onClick={handleLogout}
-                      className={`${
-                        active ? "bg-gray-100" : ""
-                      } flex items-center w-full px-4 py-2 text-sm text-red-600`}
-                    >
-                      <Clipboard className="h-4 w-4 mr-2" />
-                      Logout
-                    </Button>
-                  )}
-                </Menu.Item>
-              </Menu.Items>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Button
+                          onClick={handleLogout}
+                          className={`${
+                            active ? "bg-gray-100" : ""
+                          } flex items-center w-full px-4 py-2 text-sm text-red-600`}
+                        >
+                          <Clipboard className="h-4 w-4 mr-2" />
+                          Logout
+                        </Button>
+                      )}
+                    </Menu.Item>
+                  </Menu.Items>
+                </>
+              )}
             </Menu>
           ) : (
             <Link to="/login">

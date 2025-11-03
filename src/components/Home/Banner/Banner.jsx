@@ -19,6 +19,7 @@ function Banner() {
           className="absolute inset-0 w-full h-full object-cover pointer-events-none -z-10"
           loading="eager"
           fetchPriority="high"
+          decoding="async"
         />
       </picture>
 

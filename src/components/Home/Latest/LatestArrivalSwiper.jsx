@@ -5,14 +5,14 @@ import Card from "../../UI/Card";
 import { Button } from "@headlessui/react";
 import { Link } from "react-router-dom";
 
-function LatestArrivalSwiper({ product, reviews }) {
-  // Simple slugify function
-  const slugify = (text) =>
-    text
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]+/g, "");
+// Memoize slugify function outside component to avoid recreation
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
 
+function LatestArrivalSwiper({ product, reviews }) {
   return (
     <div className="latest-arrivals py-20 text-center">
       <h1 className="text-[60px] font-bold font-poppins">New Arrivals</h1>
@@ -21,8 +21,8 @@ function LatestArrivalSwiper({ product, reviews }) {
         modules={[Autoplay]}
         spaceBetween={16}
         slidesPerView={1}
-        autoplay={{ delay: 2000, disableOnInteraction: false }}
-        speed={3000}
+        autoplay={{ delay: 2000, disableOnInteraction: true }}
+        speed={600}
         loop={product && product.length > 1}
         breakpoints={{
           640: { slidesPerView: 2, spaceBetween: 20 },
@@ -32,10 +32,7 @@ function LatestArrivalSwiper({ product, reviews }) {
       >
         {product.map((prod, index) => (
           <SwiperSlide key={`latest-${prod._id || index}`}>
-            <Link
-              to={`/products/${prod._id}/${slugify(prod.title)}`}
-              state={{ reviews }}
-            >
+            <Link to={`/products/${prod._id}/${slugify(prod.title)}`}>
               <Card {...prod} />
             </Link>
           </SwiperSlide>
@@ -53,4 +50,4 @@ function LatestArrivalSwiper({ product, reviews }) {
   );
 }
 
-export default LatestArrivalSwiper;
+export default React.memo(LatestArrivalSwiper);

@@ -31,6 +31,7 @@ const Card = React.memo(function Card({
           loading={priority ? "eager" : "lazy"}
           alt={title}
           fetchPriority={priority ? "high" : undefined}
+          decoding="async"
           className="w-full h-full object-cover object-top rounded-[20px]"
         />
       </div>

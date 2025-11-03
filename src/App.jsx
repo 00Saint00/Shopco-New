@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Home from "./components/Home/Home";
@@ -10,7 +10,26 @@ import Cart from "./components/Cart/Cart.jsx";
 import Profile from "./components/Profile/Profile.jsx";
 
 function App() {
-  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const checkExpiry = () => {
+      const expiryTime = localStorage.getItem("expiryTime");
+      if (expiryTime && Date.now() > Number(expiryTime)) {
+        // expired → clear storage
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("expiryTime");
+        window.location.href = "/login"; // redirect to login
+      }
+    };
+
+    // run once on load
+    checkExpiry();
+
+    // run every 5s to catch expiry while browsing
+    const interval = setInterval(checkExpiry, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div>

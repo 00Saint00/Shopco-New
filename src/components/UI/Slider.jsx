@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 
@@ -7,8 +7,11 @@ import "swiper/css";
 import "swiper/css/autoplay";
 
 function Slider({ slides = [], settings = {} }) {
-  // Simple rule: enable loop only when there are more than 1 slide
-  const computedSettings = { ...settings, loop: slides.length > 1 };
+  // Memoize computed settings to avoid recreation
+  const computedSettings = useMemo(
+    () => ({ ...settings, loop: slides.length > 1 }),
+    [settings, slides.length]
+  );
 
   return (
     <div>
@@ -21,7 +24,9 @@ function Slider({ slides = [], settings = {} }) {
               <img
                 src={slide.image}
                 alt={slide.title || slide.brand || "slide"}
-                loading="lazy"
+                loading={i < 3 ? "eager" : "lazy"}
+                decoding="async"
+                fetchPriority={i < 2 ? "high" : undefined}
               />
             )}
             {slide.title && <p className="text-white">{slide.title}</p>}
@@ -37,4 +42,4 @@ function Slider({ slides = [], settings = {} }) {
   );
 }
 
-export default Slider;
+export default React.memo(Slider);

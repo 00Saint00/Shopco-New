@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from "react";
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import axios from "axios";
 import { Autoplay } from "swiper/modules";
 
@@ -33,6 +34,7 @@ function Home() {
   const [topSellingReady, setTopSellingReady] = useState(false);
   const [latestReady, setLatestReady] = useState(false);
   const latestRef = useRef(null);
+  const topSellingRef = useRef(null);
 
   // --- Swiper settings ---
   const settings = {
@@ -80,10 +82,53 @@ function Home() {
   }, []);
 
   // --- Derived Data ---
-  const latestProducts = products.slice(-8);
+  // Old way (doing it in 2 steps - not needed):
+  // const latestProducts = useMemo(() => products.slice(-8), [products]);
+  // const latestProductsWithPriority = useMemo(
+  //   () =>
+  //     latestProducts.map((product, index) => ({
+  //       ...product,
+  //       priority: index < 4,
+  //     })),
+  //   [latestProducts]
+  // );
 
-  const topSellingProducts = useMemo(
-    () => [...products].sort((a, b) => b.rating - a.rating).slice(0, 8),
+  // New way (simpler - do it all in one step):
+  // Get last 8 products and add priority flag in one step
+  const latestProductsWithPriority = useMemo(
+    () =>
+      products.slice(-8).map((product, index) => ({
+        ...product,
+        priority: index < 4,
+      })),
+    [products]
+  );
+
+  // Old way (doing it in 2 steps - not needed):
+  // const topSellingProducts = useMemo(
+  //   () => [...products].sort((a, b) => b.rating - a.rating).slice(0, 8),
+  //   [products]
+  // );
+  // const topSellingProductsWithPriority = useMemo(
+  //   () =>
+  //     topSellingProducts.map((product, index) => ({
+  //       ...product,
+  //       priority: index < 4,
+  //     })),
+  //   [topSellingProducts]
+  // );
+
+  // New way (simpler - do it all in one step):
+  // Get top 8 products by rating and add priority flag in one step
+  const topSellingProductsWithPriority = useMemo(
+    () =>
+      [...products]
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 8)
+        .map((product, index) => ({
+          ...product,
+          priority: index < 4,
+        })),
     [products]
   );
 
@@ -95,6 +140,9 @@ function Home() {
 
   // --- Fetch Reviews + Users ---
   useEffect(() => {
+    // Only fetch reviews if products are loaded (avoid unnecessary calls)
+    if (products.length === 0) return;
+
     const fetchReviews = axios.get(
       "https://fakestoreapiserver.reactbd.org/api/reviews"
     );
@@ -104,20 +152,21 @@ function Home() {
 
     Promise.all([fetchReviews, fetchUsers])
       .then(([reviewsResponse, usersResponse]) => {
-        const reviews = reviewsResponse.data.data.map((review) => {
-          const user = usersResponse.data.data.find(
-            (u) => u._id === review.userId
-          );
-          return { ...review, user };
-        });
+        // Use Map for O(1) lookup instead of O(n) find
+        const userMap = new Map(
+          usersResponse.data.data.map((user) => [user._id, user])
+        );
+        const reviews = reviewsResponse.data.data.map((review) => ({
+          ...review,
+          user: userMap.get(review.userId),
+        }));
         setReviews(reviews);
-        setLoading(false);
       })
       .catch((error) => {
-        setError(error.message);
-        setLoading(false);
+        // Don't set loading to false here as it's already handled in products fetch
+        console.error("Failed to fetch reviews:", error);
       });
-  }, []);
+  }, [products.length]);
 
   useEffect(() => {
     if (!loading && products.length > 0) {
@@ -131,21 +180,36 @@ function Home() {
   }, [loading, products]);
 
   // Animate LatestArrival container when it becomes ready
-  useEffect(() => {
-    if (latestReady && latestRef.current) {
-      const el = latestRef.current;
-      // animate from slightly down + invisible to visible
-      gsap.fromTo(
-        el,
-        { opacity: 0 },
-        { opacity: 1, xPercent: 0, duration: 1.5, ease: "power1.inOut" }
-      );
-      return () => {
-        gsap.killTweensOf(el);
-      };
-    }
-    return undefined;
-  }, [latestReady]);
+  useGSAP(
+    () => {
+      if (latestReady && latestRef.current) {
+        const el = latestRef.current;
+        // animate from slightly down + invisible to visible
+        gsap.fromTo(
+          el,
+          { opacity: 0 },
+          { opacity: 1, xPercent: 0, duration: 1.5, ease: "power1.inOut" }
+        );
+      }
+    },
+    { dependencies: [latestReady] }
+  );
+
+  // Animate TopSelling container when it becomes ready
+  useGSAP(
+    () => {
+      if (topSellingReady && topSellingRef.current) {
+        const el = topSellingRef.current;
+        // animate from slightly down + invisible to visible
+        gsap.fromTo(
+          el,
+          { opacity: 0 },
+          { opacity: 1, xPercent: 0, duration: 1.5, ease: "power1.inOut" }
+        );
+      }
+    },
+    { dependencies: [topSellingReady] }
+  );
 
   // --- Commented out Spinner/Error until imported ---
   if (loading) return <Spinner />;
@@ -171,10 +235,7 @@ function Home() {
             style={{ opacity: 0 }}
           >
             <LatestArrival
-              product={latestProducts.map((product, index) => ({
-                ...product,
-                priority: index < 4,
-              }))}
+              product={latestProductsWithPriority}
               reviews={reviews}
             />
           </div>
@@ -184,13 +245,16 @@ function Home() {
             <Spinner />
           </div>
         ) : (
-          <Topselling
-            topSold={topSellingProducts.map((product, index) => ({
-              ...product,
-              priority: index < 4,
-            }))}
-            reviews={reviews}
-          />
+          <div
+            ref={topSellingRef}
+            className="topselling-animate"
+            style={{ opacity: 0 }}
+          >
+            <Topselling
+              topSold={topSellingProductsWithPriority}
+              reviews={reviews}
+            />
+          </div>
         )}
 
         <div className="py-[50px] lg:py-[100px]">

@@ -5,13 +5,14 @@ import Card from "../../UI/Card";
 import { Button } from "@headlessui/react";
 import { Link } from "react-router-dom";
 
-function TopSellingSwiper({ topSold, reviews }) {
-  const slugify = (text) =>
-    text
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]+/g, "");
+// Memoize slugify function outside component to avoid recreation
+const slugify = (text) =>
+  text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
 
+function TopSellingSwiper({ topSold, reviews }) {
   return (
     <div className="latest-arrivals py-20 text-center">
       <h1 className="text-[60px] font-bold font-poppins uppercase">
@@ -24,10 +25,10 @@ function TopSellingSwiper({ topSold, reviews }) {
         slidesPerView={1}
         autoplay={{
           delay: 3000,
-          disableOnInteraction: false,
+          disableOnInteraction: true,
           reverseDirection: true,
         }}
-        speed={800}
+        speed={600}
         loop={topSold && topSold.length > 1}
         breakpoints={{
           640: { slidesPerView: 2, spaceBetween: 20 },
@@ -37,10 +38,7 @@ function TopSellingSwiper({ topSold, reviews }) {
       >
         {topSold.map((product, index) => (
           <SwiperSlide key={`top-${product._id || index}`}>
-            <Link
-              to={`/products/${product._id}/${slugify(product.title)}`}
-              state={{ reviews }}
-            >
+            <Link to={`/products/${product._id}/${slugify(product.title)}`}>
               <Card {...product} />
             </Link>
           </SwiperSlide>
@@ -58,4 +56,4 @@ function TopSellingSwiper({ topSold, reviews }) {
   );
 }
 
-export default TopSellingSwiper;
+export default React.memo(TopSellingSwiper);
