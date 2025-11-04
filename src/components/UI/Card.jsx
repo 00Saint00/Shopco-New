@@ -45,8 +45,8 @@ const Card = React.memo(function Card({
         {/* 👇 If discounted, show both old and new prices */}
         {isDiscounted ? (
           <div className="flex items-center gap-2 mt-[8px]">
-            <p className="text-[32px] font-bold">${discountedPrice}</p>
-            <p className="line-through text-black text-opacity-10 text-[32px] font-bold">
+            <p className="text-[24px] font-bold">${discountedPrice}</p>
+            <p className="line-through text-black text-opacity-10 text-[24px] font-bold">
               ${price}
             </p>
           </div>

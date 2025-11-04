@@ -85,6 +85,7 @@ const AuthPage = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("expiryTime");
+        localStorage.removeItem("cart"); // Clear cart on auto-logout
         window.location.href = "/login"; // redirect to login
       }, expiresIn);
 
@@ -107,7 +108,7 @@ const AuthPage = () => {
         name,
         email,
         password,
-        role,
+        role: "customer",
         avatar: avatar ?? null,
       };
       const { data: newUser } = await axios.post(`${API_BASE}/users`, payload);

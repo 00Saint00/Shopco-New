@@ -144,7 +144,11 @@ function ProductDetail() {
   };
 
   const getDiscount = (originalPrice, discountedPrice) => {
-    return ((originalPrice - discountedPrice) / originalPrice) * 100;
+    if (!originalPrice || !discountedPrice || originalPrice <= 0) {
+      return 0;
+    }
+    const discountPercent = ((originalPrice - discountedPrice) / originalPrice) * 100;
+    return Math.round(discountPercent); // Round to whole number
   };
 
   if (loading)
@@ -191,8 +195,8 @@ function ProductDetail() {
                   <p className="line-through text-black text-opacity-10 text-[32px] font-bold">
                     ${product.price}
                   </p>
-                  <div className="bg-[#FF3333] bg-opacity-10 rounded-[62px] py-[6px] px-[14px]">
-                    <p className="text-[#FF3333] text-[18px] font-bold">
+                  <div className="bg-[#d13535] bg-opacity-10 rounded-[62px] py-[6px] px-[14px]">
+                    <p className="text-[#fff] text-[18px] font-bold">
                       -{getDiscount(product.price, product.discountedPrice)}%
                     </p>
                   </div>

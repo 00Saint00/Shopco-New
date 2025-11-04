@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Home from "./components/Home/Home";
 import Footer from "./components/Footer/Footer";
@@ -8,6 +8,18 @@ import AuthRoute from "./components/Utils/AuthRoute.jsx";
 import AuthPage from "./components/Auth/AuthPage.jsx";
 import Cart from "./components/Cart/Cart.jsx";
 import Profile from "./components/Profile/Profile.jsx";
+import Shop from "./components/Shop/Shop.jsx";
+
+// ScrollToTop component - scrolls to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
   useEffect(() => {
@@ -18,6 +30,7 @@ function App() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("expiryTime");
+        localStorage.removeItem("cart"); // Clear cart on session expiry
         window.location.href = "/login"; // redirect to login
       }
     };
@@ -34,11 +47,13 @@ function App() {
   return (
     <div>
       <Router>
+        <ScrollToTop />
         <Header />
         <div className="">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products/:id/:slug" element={<ProductDetail />} />
+            <Route path="/shop/:sortBy?" element={<Shop />} />
             <Route
               path="/login"
               element={
