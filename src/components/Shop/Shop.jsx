@@ -85,7 +85,7 @@ const Shop = () => {
             <Menu>
               {({ open }) => (
                 <>
-                  <Menu.Button className="flex items-center gap-2 outline-none focus:outline-none">
+                  <Menu.Button className="flex items-center gap-2 outline-none focus:outline-none cursor-pointer">
                     <span className="text-[16px] text-black font-bold">
                       {sortLabelMap[sortBy] || "Default"}
                     </span>

@@ -217,7 +217,7 @@ const Header = () => {
           </Menu>
 
           <Link to="/on-sale">On Sale</Link>
-          <Link to="/new-arrival">New Arrival</Link>
+          <Link to="shop/latest-product">New Arrival</Link>
           <Link to="/brands">Brands</Link>
         </nav>
 

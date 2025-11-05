@@ -55,10 +55,6 @@ function ProductDetail() {
         // find the current product by id
         const current = discountedAll.find((p) => String(p._id) === id);
 
-        console.log("Route id:", id);
-        console.log("Matched product:", current);
-        console.log("Matched product:", current._id);
-
         // if product not found
         if (!current) {
           setError("Product not found");

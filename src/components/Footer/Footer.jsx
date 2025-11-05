@@ -24,10 +24,10 @@ function Footer() {
             <input
               type="email"
               placeholder="Enter your email address..."
-              className="w-full text-black"
+              className="w-full text-black focus:outline-none"
             />
           </div>
-          <button className="w-full bg-white hover:bg-zinc-300 hover:text-black py-[12px] px-[80.5px] rounded-[62px] text-black text-[14px]">
+          <button className="w-full bg-white hover:bg-zinc-300 hover:text-black py-[12px] px-[80.5px] rounded-[62px] text-black text-[14px] cursor-pointer">
             Subscribe to newsletter
           </button>
         </div>

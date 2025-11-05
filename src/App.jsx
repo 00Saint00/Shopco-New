@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Home from "./components/Home/Home";
 import Footer from "./components/Footer/Footer";
-import ProductDetail from "./components/Detail/ProductDetail";
+import Spinner from "./components/UI/Spiner";
 import AuthRoute from "./components/Utils/AuthRoute.jsx";
-import AuthPage from "./components/Auth/AuthPage.jsx";
-import Cart from "./components/Cart/Cart.jsx";
-import Profile from "./components/Profile/Profile.jsx";
-import Shop from "./components/Shop/Shop.jsx";
+
+// Lazy load routes - only load when needed (reduces initial bundle size)
+const ProductDetail = lazy(() => import("./components/Detail/ProductDetail"));
+const AuthPage = lazy(() => import("./components/Auth/AuthPage"));
+const Cart = lazy(() => import("./components/Cart/Cart"));
+const Profile = lazy(() => import("./components/Profile/Profile"));
+const Shop = lazy(() => import("./components/Shop/Shop"));
 
 // ScrollToTop component - scrolls to top on route change
 function ScrollToTop() {
@@ -50,29 +53,36 @@ function App() {
         <ScrollToTop />
         <Header />
         <div className="">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products/:id/:slug" element={<ProductDetail />} />
-            <Route path="/shop/:sortBy?" element={<Shop />} />
-            <Route
-              path="/login"
-              element={
-                <AuthRoute type="guest">
-                  <AuthPage />
-                </AuthRoute>
-              }
-            />
-
-            <Route
-              path="/profile"
-              element={
-                <AuthRoute type="protected">
-                  <Profile />
-                </AuthRoute>
-              }
-            />
-            <Route path="/cart" element={<Cart />} />
-          </Routes>
+          <Suspense fallback={<Spinner />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route
+                path="/products/:id/:slug"
+                element={<ProductDetail />}
+              />
+              <Route
+                path="/shop/:sortBy?"
+                element={<Shop />}
+              />
+              <Route
+                path="/login"
+                element={
+                  <AuthRoute type="guest">
+                    <AuthPage />
+                  </AuthRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <AuthRoute type="protected">
+                    <Profile />
+                  </AuthRoute>
+                }
+              />
+              <Route path="/cart" element={<Cart />} />
+            </Routes>
+          </Suspense>
         </div>
         <Footer />
       </Router>

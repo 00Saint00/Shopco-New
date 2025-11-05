@@ -1,9 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
 import ProfileInfo from "./ProfileInfo";
+import ChangePassword from "./ChangePassword";
+import axios from "axios";
 // import Orders from "./Orders";
 
+
+const API_BASE = "https://api.escuelajs.co/api/v1";
+const CHANGE_PASSWORD_URL = `${API_BASE}/auth/change-password`;
+
 const Profile = () => {
+  const [serverError, setServerError] = useState(null);
+
+
+  const handleSubmit = async (formData) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setServerError("You must be logged in to change your password");
+      return;
+    }
+
+    try {
+      // Get user ID from localStorage
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      const userId = storedUser?.id || storedUser?._id;
+      
+      if (!userId) {
+        setServerError("User ID not found");
+        return;
+      }
+
+      // Update password - send only the new password to the API
+      const { data: responseData } = await axios.put(
+        `${API_BASE}/users/${userId}`,
+        { password: formData.newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("Password changed successfully:", responseData);
+      setServerError(null);
+      // Optionally: show success message or reset form
+    } catch (err) {
+      setServerError(err.response?.data?.message || "Change password failed");
+    }
+  };
+
   return (
     <div className="flex flex-col lg:flex-row px-[16px] lg:px-[100px] pt-[80px] pb-[90%] lg:pb-[168px]">
       <Tab.Group className="w-full">
@@ -72,7 +113,10 @@ const Profile = () => {
               <div>Your wishlist here</div>
             </Tab.Panel>
             <Tab.Panel>
-              <div>Change password / settings</div>
+              {/* <div>Change password / settings</div> */}
+              <div>
+                <ChangePassword onSubmit={handleSubmit} serverError={serverError}/>
+              </div>
             </Tab.Panel>
           </Tab.Panels>
         </div>
