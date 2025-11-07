@@ -7,8 +7,10 @@ import Tabs from "../UI/Tabs";
 import Error from "../UI/Error";
 import ProductTab from "./ProductTab";
 // import RelatedProducts from "./RelatedProducts";
-import { addToCart } from "../Utils/CartUtils";
+// import { addToCart } from "../Utils/CartUtils";
 import { applyDailyDiscounts } from "../Utils/discountUtils";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../store/slices/cartSlice";
 
 function ProductDetail() {
   const { id } = useParams(); // this comes from the route /products/:id
@@ -20,6 +22,8 @@ function ProductDetail() {
   const [reviews, setReviews] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
+   // const [cartCount, setCartCount] = useState(0);
+   const dispatch = useDispatch();
   // const location = useLocation();
   // const reviews = location.state?.reviews || [];
   // console.log(reviews);
@@ -262,7 +266,18 @@ function ProductDetail() {
               <Button
                 className="w-full py-[15px] bg-black text-white rounded-[62px]"
                 onClick={() => {
-                  addToCart(product, selectedSize, quantity);
+                  // addToCart(product, selectedSize, quantity);
+                  dispatch(addToCart({
+                    _id: product._id,
+                    title: product.title,
+                    image: product.image,
+                    price: product.isDiscounted ? product.discountedPrice : product.price,
+                    originalPrice: product.price,
+                    quantity,
+                    size: selectedSize,
+                    category: product.category,
+                  }));
+                  alert("Item added to cart!");
                 }}
               >
                 Add to Cart

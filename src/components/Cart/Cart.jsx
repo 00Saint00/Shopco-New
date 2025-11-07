@@ -1,33 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@headlessui/react";
-import { addToCart, removeFromCart } from "../Utils/CartUtils";
+// import { addToCart, removeFromCart } from "../Utils/CartUtils";
+import { useSelector, useDispatch } from "react-redux";
+import { removeFromCart,clearCart, addToCart } from "../../store/slices/cartSlice";
+
 // import trash
 
 const Cart = () => {
-  const [cart, setCart] = useState([]);
+  // const [cart, setCart] = useState([]);
+const dispatch = useDispatch();
+const cart = useSelector((state) => state.cart.cart);
 
   // Fetch cart from localStorage when component mounts
-  const loadCart = () => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(storedCart);
-  };
+  // const loadCart = () => {
+  //   const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+  //   setCart(storedCart);
+  // };
 
-  useEffect(() => {
-    loadCart();
-  }, []);
+  // useEffect(() => {
+  //   loadCart();
+  // }, []);
 
   // Calculate total
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // Handle quantity changes
   const handleIncrease = (item) => {
-    addToCart(item, item.size, 1); // add 1 more of same product
-    loadCart();
+    // addToCart(item, item.size, 1); // add 1 more of same product
+    // loadCart();
+    dispatch(addToCart({
+      ...item,
+      quantity: 1, // add 1 more
+    }));
   };
 
   const handleDecrease = (item) => {
-    removeFromCart(item._id, item.size); // decrease by 1 (or remove if 0)
-    loadCart();
+    // 
+    dispatch(removeFromCart({
+      ...item,
+      quantity: -1,
+    }))
   };
 
   return (

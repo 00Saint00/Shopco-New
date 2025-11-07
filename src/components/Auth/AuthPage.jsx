@@ -4,6 +4,9 @@ import Login from "./Login";
 import Register from "./Register";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login, logout } from "../../store/slices/authSlice";
+import { clearCart } from "../../store/slices/cartSlice";
 
 const API_URL = "https://api.escuelajs.co/api/v1/users";
 const Register_URL = "https://api.escuelajs.co/api/v1/users";
@@ -11,9 +14,10 @@ const API_BASE = "https://api.escuelajs.co/api/v1";
 
 const AuthPage = () => {
   const [serverError, setServerError] = useState(null);
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
 
   const from = location.state?.from || "/";
 
@@ -69,6 +73,11 @@ const AuthPage = () => {
         },
       });
 
+      dispatch(login({
+        user: profileRes.data,
+        token: access_token,
+      }));
+
       // 3) Store token + user
       const expiresIn = 60 * 60 * 1000; // 1 hour session
       const expiryTime = Date.now() + expiresIn;
@@ -78,10 +87,13 @@ const AuthPage = () => {
       localStorage.setItem("expiryTime", expiryTime.toString());
 
       // 🔑 Broadcast update so Header picks it up
-      window.dispatchEvent(new Event("storageUpdate"));
+      // window.dispatchEvent(new Event("storageUpdate"));
 
       // 4) Auto-logout after expiry
       setTimeout(() => {
+        dispatch(logout());
+        dispatch(clearCart());
+
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("expiryTime");
@@ -89,7 +101,7 @@ const AuthPage = () => {
         window.location.href = "/login"; // redirect to login
       }, expiresIn);
 
-      setUser(profileRes.data);
+      // setUser(profileRes.data);
 
       console.log("✅ Logged in user:", profileRes.data);
       // window.location.href = "/";

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import logo from "../../assets/logo/SHOP.CO.svg";
 import cart from "../../assets/logo/cart.svg";
 import { Menu, Button } from "@headlessui/react";
@@ -11,15 +12,24 @@ import {
   User,
   ClipboardCheck,
   X,
+  ShoppingCart,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { logout } from "../../store/slices/authSlice";
 
 const Header = () => {
   const [navOpen, setNavOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [cartCount, setCartCount] = useState(0);
+  // const [user, setUser] = useState(null);
+  // const [cartCount, setCartCount] = useState(0);
+  const dispatch = useDispatch();
+
+
+// Get state from Redux
+const user = useSelector((state) => state.auth.user);
+const cart = useSelector((state) => state.cart.cart);
+const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const menuRef = useRef(null);
   const cartRef = useRef(null);
@@ -52,36 +62,47 @@ const Header = () => {
   //     });
   // }, []);
 
-  useEffect(() => {
-    const loadUser = () => {
-      const storedUser = localStorage.getItem("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    };
+  // useEffect(() => {
+  //   const loadUser = () => {
+  //     const storedUser = localStorage.getItem("user");
+  //     setUser(storedUser ? JSON.parse(storedUser) : null);
+  //   };
 
-    const loadCart = () => {
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const count = savedCart.reduce((sum, item) => sum + item.quantity, 0);
-      setCartCount(count);
-    };
+  //   const loadCart = () => {
+  //     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+  //     const count = savedCart.reduce((sum, item) => sum + item.quantity, 0);
+  //     setCartCount(count);
+  //   };
 
-    // Initial load
-    loadUser();
-    loadCart();
+  //   // Initial load
+  //   loadUser();
+  //   loadCart();
 
-    // ✅ Listen for storage updates (triggered by add/remove functions)
-    const handleStorageUpdate = () => {
-      loadUser();
-      loadCart();
-    };
+  //   // ✅ Listen for storage updates (triggered by add/remove functions)
+  //   const handleStorageUpdate = () => {
+  //     loadUser();
+  //     loadCart();
+  //   };
 
-    window.addEventListener("storageUpdate", handleStorageUpdate);
-    window.addEventListener("storage", handleStorageUpdate); // also works cross-tab
+  //   window.addEventListener("storageUpdate", handleStorageUpdate);
+  //   window.addEventListener("storage", handleStorageUpdate); // also works cross-tab
 
-    return () => {
-      window.removeEventListener("storageUpdate", handleStorageUpdate);
-      window.removeEventListener("storage", handleStorageUpdate);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("storageUpdate", handleStorageUpdate);
+  //     window.removeEventListener("storage", handleStorageUpdate);
+  //   };
+  // }, []);
+
+
+const logoutUser = () => {
+  // Update Redux state
+  dispatch(logout());
+  
+  // Still clear localStorage (for persistence)
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  localStorage.removeItem("cart");
+};
 
   useGSAP(() => {
     // GSAP target may be null if the overlay hasn't mounted yet.
@@ -128,12 +149,12 @@ const Header = () => {
   }, [navOpen]);
 
   // ✅ Logout clears user & cart instantly
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("cart");
-    window.dispatchEvent(new Event("storageUpdate"));
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("user");
+  //   localStorage.removeItem("token");
+  //   localStorage.removeItem("cart");
+  //   window.dispatchEvent(new Event("storageUpdate"));
+  // };
 
   return (
     <header className="flex justify-between items-center lg:px-[100px] px-[16px] bg-white shadow-sm relative z-50">
@@ -235,12 +256,13 @@ const Header = () => {
         <div className="flex items-center gap-[14px]">
           <div className="relative" ref={cartRef}>
             <Link to="/cart">
-              <img
+              {/* <img
                 src={cart}
                 alt="Cart"
                 className="h-[24px] w-[24px]"
                 loading="lazy"
-              />
+              /> */}
+              <ShoppingCart className="h-[24px] w-[24px]" />
             </Link>
 
             {/* 🔵 Blue badge */}
@@ -314,7 +336,7 @@ const Header = () => {
                     <Menu.Item>
                       {({ active }) => (
                         <Button
-                          onClick={handleLogout}
+                          onClick={logoutUser}
                           className={`${
                             active ? "bg-gray-100" : ""
                           } flex items-center w-full px-4 py-2 text-sm text-red-600`}
