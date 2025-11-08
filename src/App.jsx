@@ -1,10 +1,14 @@
 import { useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loadCartFromStorage, clearCart } from "./store/slices/cartSlice";
+import {loadUserFromStorage, logout} from "./store/slices/authSlice";
 import Header from "./components/Header/Header";
 import Home from "./components/Home/Home";
 import Footer from "./components/Footer/Footer";
 import Spinner from "./components/UI/Spiner";
 import AuthRoute from "./components/Utils/AuthRoute.jsx";
+
 
 // Lazy load routes - only load when needed (reduces initial bundle size)
 const ProductDetail = lazy(() => import("./components/Detail/ProductDetail"));
@@ -25,27 +29,74 @@ function ScrollToTop() {
 }
 
 function App() {
+const dispatch = useDispatch();
+
+
+  // useEffect(() => {
+  //   const checkExpiry = () => {
+  //     const expiryTime = localStorage.getItem("expiryTime");
+  //     if (expiryTime && Date.now() > Number(expiryTime)) {
+  //       // expired → clear storage
+  //       localStorage.removeItem("token");
+  //       localStorage.removeItem("user");
+  //       localStorage.removeItem("expiryTime");
+  //       localStorage.removeItem("cart"); // Clear cart on session expiry
+  //       window.location.href = "/login"; // redirect to login
+  //     }
+  //   };
+
+  //   // run once on load
+  //   checkExpiry();
+
+  //   // run every 5s to catch expiry while browsing
+  //   const interval = setInterval(checkExpiry, 5000);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
   useEffect(() => {
-    const checkExpiry = () => {
-      const expiryTime = localStorage.getItem("expiryTime");
-      if (expiryTime && Date.now() > Number(expiryTime)) {
-        // expired → clear storage
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("expiryTime");
-        localStorage.removeItem("cart"); // Clear cart on session expiry
-        window.location.href = "/login"; // redirect to login
-      }
-    };
+    // Load cart
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    dispatch(loadCartFromStorage(savedCart));
 
-    // run once on load
-    checkExpiry();
+    // Load user
+    const savedUser = localStorage.getItem("user");
+    const savedToken = localStorage.getItem("token");
+    if (savedUser && savedToken) {
+      dispatch(loadUserFromStorage({
+        user: JSON.parse(savedUser),
+        token: savedToken,
+      }));
+    }
+  }, [dispatch]);
 
-    // run every 5s to catch expiry while browsing
-    const interval = setInterval(checkExpiry, 5000);
+ // Check for session expiry and update Redux
+ useEffect(() => {
+  const checkExpiry = () => {
+    const expiryTime = localStorage.getItem("expiryTime");
+    if (expiryTime && Date.now() > Number(expiryTime)) {
+      // Update Redux
+      dispatch(logout());
+      dispatch(clearCart());
+      
+      // Clear localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("expiryTime");
+      localStorage.removeItem("cart");
+      window.location.href = "/login";
+    }
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  // run once on load
+  checkExpiry();
+
+  // run every 5s to catch expiry while browsing
+  const interval = setInterval(checkExpiry, 5000);
+
+  return () => clearInterval(interval);
+}, [dispatch]);
+
 
   return (
     <div>
