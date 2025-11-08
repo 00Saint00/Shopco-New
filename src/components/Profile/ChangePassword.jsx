@@ -14,7 +14,7 @@ const ChangePassword = ({ onSubmit, serverError }) => {
     formState: { errors, isSubmitting },
     getValues,
     reset,
-  } = useForm();
+  } = useForm();  
 
   return (
     <div className="space-y-4">
@@ -123,10 +123,10 @@ const ChangePassword = ({ onSubmit, serverError }) => {
         )}
 
 
-        <Button className="mt-5 bg-white border border-black border-opacity-10 text-black px-20 py-3 rounded-full font-normal hover:bg-black hover:text-white transition duration-300"
+      <Button className="mt-5 bg-black border border-black border-opacity-10 text-white px-4 py-2 rounded hover:bg-black hover:text-white transition duration-300 cursor-pointer"
       disabled={isSubmitting}
       type="submit">
-          {isSubmitting ? "Changing Password..." : "Change Password"}
+          {isSubmitting ? "Changing Password..." : "Confirm Password Change"}
         </Button>
       </form>
     </div>

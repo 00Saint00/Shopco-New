@@ -3,15 +3,16 @@ import { Tab } from "@headlessui/react";
 import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import axios from "axios";
+import { Button } from "@headlessui/react";
+import { TruckElectricIcon } from "lucide-react";
 // import Orders from "./Orders";
-
 
 const API_BASE = "https://api.escuelajs.co/api/v1";
 const CHANGE_PASSWORD_URL = `${API_BASE}/auth/change-password`;
 
 const Profile = () => {
   const [serverError, setServerError] = useState(null);
-
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleSubmit = async (formData) => {
     const token = localStorage.getItem("token");
@@ -24,7 +25,7 @@ const Profile = () => {
       // Get user ID from localStorage
       const storedUser = JSON.parse(localStorage.getItem("user"));
       const userId = storedUser?.id || storedUser?._id;
-      
+
       if (!userId) {
         setServerError("User ID not found");
         return;
@@ -39,6 +40,8 @@ const Profile = () => {
 
       console.log("Password changed successfully:", responseData);
       setServerError(null);
+      setShowChangePassword(false);
+
       // Optionally: show success message or reset form
     } catch (err) {
       setServerError(err.response?.data?.message || "Change password failed");
@@ -114,8 +117,47 @@ const Profile = () => {
             </Tab.Panel>
             <Tab.Panel>
               {/* <div>Change password / settings</div> */}
-              <div>
+              {/* <div>
                 <ChangePassword onSubmit={handleSubmit} serverError={serverError}/>
+              </div> */}
+
+              <div>
+                {!showChangePassword ? (
+                  <div className="flex flex-col gap-4">
+                    {/* <ChangePassword
+                      onSubmit={handleSubmit}
+                      serverError={serverError}
+                    /> */}
+                    {/* Optional: Add a cancel/back button */}
+                    {/* <button
+                      onClick={() => setShowChangePassword(false)}
+                      className="mt-4 text-gray-600 hover:text-black"
+                    >
+                      Cancel
+                    </button> */}
+                    <Button className="rounded bg-black px-4 py-2 text-sm text-white data-hover:bg-black/80 data-hover:data-active:bg-black/80 cursor-pointer w-full lg:w-60" onClick={() => setShowChangePassword(true)}>
+                      Change Password{" "}
+                    </Button>
+
+                    <Button className="rounded bg-black px-4 py-2 text-sm text-white data-hover:bg-black/80 data-hover:data-active:bg-black/80 cursor-pointer w-full lg:w-60" >
+                    Help Center{" "}
+                    </Button>
+                  </div>
+                ) : (
+                  <div>
+                    <ChangePassword
+                      onSubmit={handleSubmit}
+                      serverError={serverError}
+                    />
+                    {/* Optional: Add a cancel/back button */}
+                    <button
+                      onClick={() => setShowChangePassword(false)}
+                      className="mt-4 text-gray-600 hover:text-black"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </div>
             </Tab.Panel>
           </Tab.Panels>
