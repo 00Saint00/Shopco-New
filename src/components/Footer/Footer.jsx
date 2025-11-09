@@ -13,7 +13,7 @@ import logo from "../../assets/logo/SHOP.CO.svg";
 function Footer() {
   return (
     <div className="relative bg-[#F0F0F0] text-white pt-[189px] pb-[77px] py-[186px] lg:py-[140px] px-[18px] lg:px-[100px]">
-      <div className="absolute inset-x-0 -top-[22%] mx-auto w-[96%] lg:w-[90%] bg-black py-[32px] lg:py-[43px] px-[24px] lg:px-[64px] rounded-[20px] grid grid-cols-1 md:grid-cols-2 gap-[32px] lg:gap-[212px]">
+      <div className="absolute inset-x-0 -top-[16%] md:-top-[10%] lg:-top-[16%] mx-auto w-[96%] lg:w-[90%] bg-black py-[32px] lg:py-[43px] px-[24px] lg:px-[64px] rounded-[20px] grid grid-cols-1 md:grid-cols-2 gap-[32px] lg:gap-[212px]">
         <h3 className="text-[32px] lg:text-[40px] font-bold leading-[35px] lg:leading-[45px] text-white text-poppins">
           STAY UPTO DATE ABOUT OUR LATEST OFFERS
         </h3>

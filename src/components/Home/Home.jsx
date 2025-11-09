@@ -263,7 +263,7 @@ function Home() {
           </Suspense>
         </div>
 
-        <div className="py-[50px] pt-[50px] lg:pt-[80px] pb-[90%] lg:pb-[170px]">
+        <div className="py-[50px] pt-[50px] lg:pt-[80px] pb-[90%] md:pb-[35%]  lg:pb-[170px]">
           <Suspense fallback={<Spinner />}>
             <Testimonials reviews={reviews} />
           </Suspense>

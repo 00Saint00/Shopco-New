@@ -134,7 +134,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[60%] lg:pb-[168px]">
+    <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[90%] lg:pb-[168px]">
       <h1 className="text-2xl font-bold mb-6">Authentication</h1>
 
       <div className="w-full max-w-md mx-auto">
