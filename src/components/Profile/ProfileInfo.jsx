@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { PencilIcon, Check, X } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import { updateUser } from "../../store/slices/authSlice";
 
 const API_BASE = "https://api.escuelajs.co/api/v1";
 const ProfileInfo = () => {
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(null);
   // const [nameInput, setNameInput] = useState("");
   const [serverError, setServerError] = useState(null);
@@ -17,6 +19,11 @@ const ProfileInfo = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+
+
+  //get state from redux
+  const user = useSelector((state)=> state.auth.user);
 
   // useEffect(() => {
   //   const storedUser = localStorage.getItem("user");
@@ -35,27 +42,50 @@ const ProfileInfo = () => {
   // }, [navigate, location]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      navigate("/login", { state: { from: location } });
-      return;
-    }
+    // const storedUser = localStorage.getItem("user");
+    // if (!storedUser) {
+    //   navigate("/login", { state: { from: location } });
+    //   return;
+    // }
 
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
+    // const parsedUser = JSON.parse(storedUser);
+    // // setUser(parsedUser);
+    // dispatch(updateUser(parsedUser))
+    // setFormData({
+    //   name: parsedUser.name,
+    //   email: parsedUser.email,
+    //   avatar: parsedUser.avatar,
+    // });
+
+    if (!user){
+      const storedUser = localStorage.getItem("user");
+      if(!storedUser){
+        navigate("/login", { state: { from: location } });
+        return;
+      }
+      const parsedUser = JSON.parse(storedUser);
+    dispatch(updateUser(parsedUser));
     setFormData({
       name: parsedUser.name,
       email: parsedUser.email,
       avatar: parsedUser.avatar,
     });
+    }else{
+      setFormData({
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+      });
+    }
 
     // Optional: fetch fresh data from API to stay up-to-date
     axios
-      .get(`${API_BASE}/users/${parsedUser.id || parsedUser._id}`)
+      .get(`${API_BASE}/users/${user.id || user._id}`)
       .then(({ data }) => {
         if (!data || typeof data !== "object") return;
         // Only update local state/storage when we received a valid user object
-        setUser(data);
+        // setUser(data);
+        dispatch(updateUser(data))
         setFormData({
           name: data.name || "",
           email: data.email || "",
@@ -69,7 +99,7 @@ const ProfileInfo = () => {
         }
       })
       .catch((err) => console.warn("Could not fetch fresh user data:", err));
-  }, [navigate, location]);
+  }, [navigate, location,dispatch,user]);
 
   const handleSave = async () => {
     const token = localStorage.getItem("token");
@@ -83,8 +113,9 @@ const ProfileInfo = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setUser(data);
-      localStorage.setItem("user", JSON.stringify(data));
+      // setUser(data);
+      // localStorage.setItem("user", JSON.stringify(data));
+      dispatch(updateUser(data))
       setIsEditing(false);
       setServerError(null);
     } catch (err) {

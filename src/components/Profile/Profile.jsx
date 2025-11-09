@@ -116,45 +116,55 @@ const Profile = () => {
               <div>Your wishlist here</div>
             </Tab.Panel>
             <Tab.Panel>
-              {/* <div>Change password / settings</div> */}
-              {/* <div>
-                <ChangePassword onSubmit={handleSubmit} serverError={serverError}/>
-              </div> */}
-
               <div>
+                {/* SETTINGS PANEL */}
                 {!showChangePassword ? (
                   <div className="flex flex-col gap-4">
-                    {/* <ChangePassword
-                      onSubmit={handleSubmit}
-                      serverError={serverError}
-                    /> */}
-                    {/* Optional: Add a cancel/back button */}
-                    {/* <button
-                      onClick={() => setShowChangePassword(false)}
-                      className="mt-4 text-gray-600 hover:text-black"
+                    <Button
+                      className="rounded bg-black px-4 py-2 text-sm text-white data-hover:bg-black/80 data-hover:data-active:bg-black/80 cursor-pointer w-full lg:w-60"
+                      onClick={() => setShowChangePassword("password")}
                     >
-                      Cancel
-                    </button> */}
-                    <Button className="rounded bg-black px-4 py-2 text-sm text-white data-hover:bg-black/80 data-hover:data-active:bg-black/80 cursor-pointer w-full lg:w-60" onClick={() => setShowChangePassword(true)}>
-                      Change Password{" "}
+                      Change Password
                     </Button>
 
-                    <Button className="rounded bg-black px-4 py-2 text-sm text-white data-hover:bg-black/80 data-hover:data-active:bg-black/80 cursor-pointer w-full lg:w-60" >
-                    Help Center{" "}
+                    <Button
+                      className="rounded bg-black px-4 py-2 text-sm text-white data-hover:bg-black/80 data-hover:data-active:bg-black/80 cursor-pointer w-full lg:w-60"
+                      onClick={() => setShowChangePassword("help")}
+                    >
+                      Help Center
                     </Button>
                   </div>
-                ) : (
+                ) : showChangePassword === "password" ? (
                   <div>
                     <ChangePassword
                       onSubmit={handleSubmit}
                       serverError={serverError}
                     />
-                    {/* Optional: Add a cancel/back button */}
                     <button
                       onClick={() => setShowChangePassword(false)}
                       className="mt-4 text-gray-600 hover:text-black"
                     >
                       Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">Help Center</h2>
+                    <p className="text-gray-700 mb-4">
+                      For support, please contact us via email at{" "}
+                      <a
+                        href="mailto:support@example.com"
+                        className="text-black underline"
+                      >
+                        support@example.com
+                      </a>{" "}
+                      or visit our FAQs.
+                    </p>
+                    <button
+                      onClick={() => setShowChangePassword(false)}
+                      className="mt-4 text-gray-600 hover:text-black"
+                    >
+                      Back
                     </button>
                   </div>
                 )}
