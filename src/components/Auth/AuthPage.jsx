@@ -73,10 +73,12 @@ const AuthPage = () => {
         },
       });
 
-      dispatch(login({
-        user: profileRes.data,
-        token: access_token,
-      }));
+      dispatch(
+        login({
+          user: profileRes.data,
+          token: access_token,
+        })
+      );
 
       // 3) Store token + user
       const expiresIn = 60 * 60 * 1000; // 1 hour session
@@ -134,7 +136,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[90%] lg:pb-[168px]">
+    <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[50%] md:pb-[25%] lg:pb-[168px]">
       <h1 className="text-2xl font-bold mb-6">Authentication</h1>
 
       <div className="w-full max-w-md mx-auto">
