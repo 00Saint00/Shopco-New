@@ -2,6 +2,7 @@ import { Button } from "@headlessui/react";
 import banner800 from "../../../assets/logo/banner-800.webp";
 import banner1200 from "../../../assets/logo/banner-1200.webp";
 import banner1600 from "../../../assets/logo/banner-1600.webp";
+import { Link } from "react-router-dom";
 
 function Banner() {
   return (
@@ -36,9 +37,12 @@ function Banner() {
           </p>
 
           <div className="flex justify-center lg:justify-start">
+            <Link to="/shop">
+           
             <Button className="bg-black text-white px-[40px] lg:px-[67.5px] py-[15px] rounded-full font-semibold hover:bg-gray-600 transition duration-300">
               Shop Now
             </Button>
+            </Link>
           </div>
 
           <div className="flex flex-wrap justify-center lg:justify-start lg:flex-row gap-[24px] lg:gap-[30px] pt-[40px] lg:pt-[50px] items-center lg:items-start">

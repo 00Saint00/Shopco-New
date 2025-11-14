@@ -184,11 +184,11 @@ const logoutUser = () => {
         </div>
 
         {/* Logo */}
-        <Link to="/" className="flex-shrink-0">
+        <Link to="/" className="flex-shrink-0 p-0 m-0 cursor-pointer">
           <img
             src={logo}
             alt="Logo"
-            className="h-[22px] w-[160px]"
+            className="h-[22px] w-[140px]"
             loading="eager"
           />
         </Link>

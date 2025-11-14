@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../UI/Spiner";
 import Error from "../UI/Error";
@@ -17,13 +17,14 @@ const slugify = (text) =>
     .replace(/[^\w-]+/g, "");
 
 const Shop = () => {
-  const { sortBy } = useParams(); // captures optional sort
+  const { sortBy, categoryName } = useParams(); // captures optional sort
+  const location = useLocation(); // to check if we're on /on-sale route
   const [allProducts, setAllProducts] = useState([]); // store original fetched products
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch products once on mount
+  // Fetch products once on mount  
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -42,11 +43,28 @@ const Shop = () => {
     fetchProducts();
   }, []);
 
-  // Memoize sorted products - only recalculate when sortBy or allProducts changes
+  // Memoize sorted products - only recalculate when sortBy, categoryName, location, or allProducts changes
   const products = useMemo(() => {
     if (!allProducts.length) return [];
 
-    let sorted = [...allProducts];
+    // Filter products - check for on-sale first, then category
+    let filteredProducts = [...allProducts];
+    
+    // Check if we're on the /on-sale route
+    if (location.pathname === "/on-sale" || location.pathname.startsWith("/on-sale/")) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.isDiscounted === true
+      );
+    } 
+    // Otherwise, filter by category if categoryName exists (for men/women)
+    else if (categoryName) {
+      filteredProducts = filteredProducts.filter(
+        (product) => product.category?.toLowerCase() === categoryName.toLowerCase()
+      );
+    }
+
+    // Then sort the filtered products
+    let sorted = [...filteredProducts];
     if (sortBy === "top-selling") {
       sorted.sort((a, b) => b.rating - a.rating);
     } else if (sortBy === "a-z") {
@@ -58,7 +76,7 @@ const Shop = () => {
     }
 
     return sorted;
-  }, [sortBy, allProducts]);
+  }, [sortBy, categoryName, location.pathname, allProducts]);
 
   if (loading) return <Spinner />;
   if (error)
@@ -74,7 +92,13 @@ const Shop = () => {
   return (
     <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[168px]">
       <div className="flex lg:justify-between mb-6">
-        <h2 className="text-[24px] lg:text-[32px] font-bold mb-[16px]">Shop</h2>
+        <h2 className="text-[24px] lg:text-[32px] font-bold mb-[16px]">
+          {location.pathname === "/on-sale" || location.pathname.startsWith("/on-sale/")
+            ? "Items on Sale"
+            : categoryName
+            ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)
+            : "Shop"}
+        </h2>
 
         {/* Sorting buttons */}
         <div className="flex items-center gap-[20px]">
@@ -104,7 +128,16 @@ const Shop = () => {
                             className={`w-full text-left px-4 py-2 rounded-md ${
                               active ? "bg-blue-100" : ""
                             }`}
-                            onClick={() => navigate(`/shop/${key}`)}
+                            onClick={() => {
+                              if (location.pathname === "/on-sale" || location.pathname.startsWith("/on-sale/")) {
+                                navigate(`/on-sale/${key}`);
+                              } else if (categoryName) {
+                                navigate(`/category/${categoryName}/${key}`);
+                              }
+                               else {
+                                navigate(`/shop/${key}`);
+                              }
+                            }}
                           >
                             {label}
                           </button>

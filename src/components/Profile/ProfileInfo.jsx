@@ -16,14 +16,14 @@ const ProfileInfo = () => {
     email: "",
     avatar: "",
   });
+  const [show, setShow] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-
   //get state from redux
-  const user = useSelector((state)=> state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
   // useEffect(() => {
   //   const storedUser = localStorage.getItem("user");
@@ -57,20 +57,20 @@ const ProfileInfo = () => {
     //   avatar: parsedUser.avatar,
     // });
 
-    if (!user){
+    if (!user) {
       const storedUser = localStorage.getItem("user");
-      if(!storedUser){
+      if (!storedUser) {
         navigate("/login", { state: { from: location } });
         return;
       }
       const parsedUser = JSON.parse(storedUser);
-    dispatch(updateUser(parsedUser));
-    setFormData({
-      name: parsedUser.name,
-      email: parsedUser.email,
-      avatar: parsedUser.avatar,
-    });
-    }else{
+      dispatch(updateUser(parsedUser));
+      setFormData({
+        name: parsedUser.name,
+        email: parsedUser.email,
+        avatar: parsedUser.avatar,
+      });
+    } else {
       setFormData({
         name: user.name,
         email: user.email,
@@ -85,7 +85,7 @@ const ProfileInfo = () => {
         if (!data || typeof data !== "object") return;
         // Only update local state/storage when we received a valid user object
         // setUser(data);
-        dispatch(updateUser(data))
+        dispatch(updateUser(data));
         setFormData({
           name: data.name || "",
           email: data.email || "",
@@ -99,7 +99,7 @@ const ProfileInfo = () => {
         }
       })
       .catch((err) => console.warn("Could not fetch fresh user data:", err));
-  }, [navigate, location,dispatch,user]);
+  }, [navigate, location, dispatch, user]);
 
   const handleSave = async () => {
     const token = localStorage.getItem("token");
@@ -115,7 +115,7 @@ const ProfileInfo = () => {
 
       // setUser(data);
       // localStorage.setItem("user", JSON.stringify(data));
-      dispatch(updateUser(data))
+      dispatch(updateUser(data));
       setIsEditing(false);
       setServerError(null);
     } catch (err) {
