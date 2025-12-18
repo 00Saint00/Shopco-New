@@ -8,6 +8,9 @@ import { useDispatch } from "react-redux";
 import { login, logout } from "../../store/slices/authSlice";
 import { clearCart } from "../../store/slices/cartSlice";
 
+import { loginUser, registerUser } from "../../services/authservice";
+import { storage, ID, config } from "../../lib/appwrite";
+
 const API_URL = "https://api.escuelajs.co/api/v1/users";
 const Register_URL = "https://api.escuelajs.co/api/v1/users";
 const API_BASE = "https://api.escuelajs.co/api/v1";
@@ -24,88 +27,111 @@ const AuthPage = () => {
   // const handleSubmit = async ({ email, password }) => {
   //   setServerError(null);
   //   try {
-  //     const { data } = await axios.get(API_URL);
+  //     // 1) Login → get token
+  //     // Use full API base so requests work in dev/prod (not rely on a proxy)
+  //     const { data } = await axios.post(`${API_BASE}/auth/login`, {
+  //       email,
+  //       password,
+  //     });
 
-  //     const users = Array.isArray(data) ? data : data.data ?? [];
+  //     const { access_token } = data; // API returns { access_token, refresh_token }
 
-  //     // DEMO rule: password === username
-  //     const user = users.find(
-  //       (u) =>
-  //         u.email.toLowerCase() === email.toLowerCase() &&
-  //         u.password === password
-  //     );
-
-  //     if (!user) {
-  //       setServerError("Invalid email or password");
+  //     if (!access_token) {
+  //       setServerError("Login failed: No token received");
   //       return;
   //     }
 
-  //     // success → save and redirect
-  //     localStorage.setItem("user", JSON.stringify(user));
-  //     // window.location.href = "/"; // change route if needed
-  //     console.log("✅ Yup! We are logged in:", user);
+  //     // 2) Fetch user profile with token
+  //     const profileRes = await axios.get(`${API_BASE}/auth/profile`, {
+  //       headers: {
+  //         Authorization: `Bearer ${access_token}`,
+  //       },
+  //     });
+
+  //     dispatch(
+  //       login({
+  //         user: profileRes.data,
+  //         token: access_token,
+  //       })
+  //     );
+
+  //     // 3) Store token + user
+  //     const expiresIn = 60 * 60 * 1000; // 1 hour session
+  //     const expiryTime = Date.now() + expiresIn;
+
+  //     localStorage.setItem("token", access_token);
+  //     localStorage.setItem("user", JSON.stringify(profileRes.data));
+  //     localStorage.setItem("expiryTime", expiryTime.toString());
+
+  //     // 🔑 Broadcast update so Header picks it up
+  //     // window.dispatchEvent(new Event("storageUpdate"));
+
+  //     // 4) Auto-logout after expiry
+  //     setTimeout(() => {
+  //       dispatch(logout());
+  //       dispatch(clearCart());
+
+  //       localStorage.removeItem("token");
+  //       localStorage.removeItem("user");
+  //       localStorage.removeItem("expiryTime");
+  //       localStorage.removeItem("cart"); // Clear cart on auto-logout
+  //       window.location.href = "/login"; // redirect to login
+  //     }, expiresIn);
+
+  //     // setUser(profileRes.data);
+
+  //     console.log("✅ Logged in user:", profileRes.data);
+  //     // window.location.href = "/";
+  //     navigate(from, { replace: true });
   //   } catch (err) {
   //     setServerError(err.response?.data?.message || "Login failed");
   //   }
   // };
-  // ✅ LOGIN
+
+  // ✅ REGISTER
+
+  // const handleRegister = async ({ name, email, password, role, avatar }) => {
+  //   setServerError(null);
+
+  //   try {
+  //     const payload = {
+  //       name,
+  //       email,
+  //       password,
+  //       role: "customer",
+  //       avatar: avatar ?? null,
+  //     };
+  //     const { data: newUser } = await axios.post(`${API_BASE}/users`, payload);
+
+  //     localStorage.setItem("user", JSON.stringify(newUser));
+  //     console.log("✅ Registered user:", newUser);
+  //     window.location.href = "/";
+  //   } catch (err) {
+  //     setServerError(err.response?.data?.message || "Registration failed");
+  //   }
+  // };
+
   const handleSubmit = async ({ email, password }) => {
     setServerError(null);
     try {
-      // 1) Login → get token
-      // Use full API base so requests work in dev/prod (not rely on a proxy)
-      const { data } = await axios.post(`${API_BASE}/auth/login`, {
+      const { success, user, token, error } = await loginUser({
         email,
         password,
       });
 
-      const { access_token } = data; // API returns { access_token, refresh_token }
-
-      if (!access_token) {
-        setServerError("Login failed: No token received");
+      if (!success) {
+        setServerError(error || "Login failed");
         return;
       }
 
-      // 2) Fetch user profile with token
-      const profileRes = await axios.get(`${API_BASE}/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      });
-
-      dispatch(
-        login({
-          user: profileRes.data,
-          token: access_token,
-        })
-      );
+      dispatch(login({ user, token }));
 
       // 3) Store token + user
-      const expiresIn = 60 * 60 * 1000; // 1 hour session
-      const expiryTime = Date.now() + expiresIn;
 
-      localStorage.setItem("token", access_token);
-      localStorage.setItem("user", JSON.stringify(profileRes.data));
-      localStorage.setItem("expiryTime", expiryTime.toString());
+      localStorage.setItem("token", token);
+      // localStorage.setItem("user", JSON.stringify(profileRes.data));
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // 🔑 Broadcast update so Header picks it up
-      // window.dispatchEvent(new Event("storageUpdate"));
-
-      // 4) Auto-logout after expiry
-      setTimeout(() => {
-        dispatch(logout());
-        dispatch(clearCart());
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("expiryTime");
-        localStorage.removeItem("cart"); // Clear cart on auto-logout
-        window.location.href = "/login"; // redirect to login
-      }, expiresIn);
-
-      // setUser(profileRes.data);
-
-      console.log("✅ Logged in user:", profileRes.data);
       // window.location.href = "/";
       navigate(from, { replace: true });
     } catch (err) {
@@ -113,23 +139,60 @@ const AuthPage = () => {
     }
   };
 
-  // ✅ REGISTER
-  const handleRegister = async ({ name, email, password, role, avatar }) => {
+  const handleRegister = async ({
+    name,
+    email,
+    password,
+    role,
+    avatarFile,
+  }) => {
     setServerError(null);
 
     try {
-      const payload = {
+      let avatarUrl = null;
+
+      // Upload avatar file to Appwrite Storage if provided
+      if (avatarFile && avatarFile[0]) {
+        try {
+          const file = avatarFile[0];
+          const fileId = ID.unique();
+
+          console.log("📤 Uploading avatar file...");
+
+          // Upload file to Appwrite Storage
+          await storage.createFile(config.storageId, fileId, file);
+
+          // Get public URL for the uploaded file
+          avatarUrl = `${config.endpoint}/storage/buckets/${config.storageId}/files/${fileId}/view?project=${config.projectId}`;
+
+          console.log("✅ Avatar uploaded:", avatarUrl);
+        } catch (uploadError) {
+          console.error("❌ Avatar upload error:", uploadError);
+          // Continue registration even if avatar upload fails
+        }
+      } else {
+        console.log("ℹ️ No avatar file provided");
+      }
+
+      const { success, user, error } = await registerUser({
         name,
         email,
         password,
-        role: "customer",
-        avatar: avatar ?? null,
-      };
-      const { data: newUser } = await axios.post(`${API_BASE}/users`, payload);
+        avatar: avatarUrl, // Pass the URL, not the file
+      });
 
-      localStorage.setItem("user", JSON.stringify(newUser));
-      console.log("✅ Registered user:", newUser);
-      window.location.href = "/";
+      if (!success) {
+        setServerError(error || "Registration failed please try again");
+        return;
+      }
+
+      // localStorage.setItem("user", JSON.stringify(newUser));
+      localStorage.setItem("user", JSON.stringify(user));
+
+      console.log("✅ Registered user:", user);
+      // window.location.href = "/";
+
+      navigate("/", { replace: true });
     } catch (err) {
       setServerError(err.response?.data?.message || "Registration failed");
     }

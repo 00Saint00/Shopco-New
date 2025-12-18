@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { logout } from "../../store/slices/authSlice";
+import { logoutUsers } from "../../services/authservice";
 
 const Header = () => {
   const [navOpen, setNavOpen] = useState(false);
@@ -25,11 +26,10 @@ const Header = () => {
   // const [cartCount, setCartCount] = useState(0);
   const dispatch = useDispatch();
 
-
-// Get state from Redux
-const user = useSelector((state) => state.auth.user);
-const cart = useSelector((state) => state.cart.cart);
-const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  // Get state from Redux
+  const user = useSelector((state) => state.auth.user);
+  const cart = useSelector((state) => state.cart.cart);
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const menuRef = useRef(null);
   const cartRef = useRef(null);
@@ -93,16 +93,26 @@ const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   //   };
   // }, []);
 
+  const logoutUser = async () => {
+    try {
+      // Delete Appwrite session
+      await logoutUsers();
 
-const logoutUser = () => {
-  // Update Redux state
-  dispatch(logout());
-  
-  // Still clear localStorage (for persistence)
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-  localStorage.removeItem("cart");
-};
+      // Update Redux state
+      dispatch(logout());
+
+      // Clear localStorage (for persistence)
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("cart");
+    } catch (error) {
+      // Even if Appwrite logout fails, still clear local state
+      dispatch(logout());
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("cart");
+    }
+  };
 
   useGSAP(() => {
     // GSAP target may be null if the overlay hasn't mounted yet.
@@ -278,12 +288,18 @@ const logoutUser = () => {
               {({ open }) => (
                 <>
                   <Menu.Button className="flex items-center gap-2 focus:outline-none">
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="h-[32px] w-[32px] rounded-full"
-                      loading="lazy"
-                    />
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-[32px] w-[32px] rounded-full"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="h-[32px] w-[32px] rounded-full bg-gray-300 flex items-center justify-center">
+                        {user.name?.[0]?.toUpperCase()}
+                      </div>
+                    )}
                     <ChevronDown
                       className={`h-4 w-4 text-gray-500 transition-transform duration-400 ease-out ${
                         open ? "rotate-180" : ""

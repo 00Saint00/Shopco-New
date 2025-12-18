@@ -14,17 +14,32 @@ const Register = ({ onSubmit, serverError }) => {
 
   const [avatarPreview, setAvatarPreview] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const avatarValue = watch("avatar"); // Watch avatar input
+  // const avatarValue = watch("avatar"); // Watch avatar input
+
+  // useEffect(() => {
+  //   if (avatarValue) {
+  //     setAvatarPreview(avatarValue);
+  //   } else {
+  //     setAvatarPreview(""); // Clear preview if input is empty
+  //   }
+  // }, [avatarValue]);
+
+  const avatarFile = watch("avatarFile"); // avatarFile is an array of files
 
   useEffect(() => {
-    if (avatarValue) {
-      setAvatarPreview(avatarValue);
+    if (avatarFile && avatarFile[0]) {
+      const file = avatarFile[0];
+      const previewURL = URL.createObjectURL(file);
+      setAvatarPreview(previewURL);
+
+      // Optional: revoke the object URL when component unmounts or file changes
+      return () => URL.revokeObjectURL(previewURL);
     } else {
-      setAvatarPreview(""); // Clear preview if input is empty
+      setAvatarPreview("");
     }
-  }, [avatarValue]);
+  }, [avatarFile]);
 
   return (
     <div>
@@ -66,29 +81,28 @@ const Register = ({ onSubmit, serverError }) => {
         {/* Password */}
         <div>
           <label className="block text-sm font-medium mb-1">Password</label>
-         <div className="relative">
-         <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            {...register("password", {
-              required: "Password is required",
-              minLength: { value: 6, message: "Minimum length is 6" },
-              pattern: {
-                value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
-                message: "Password must contain letters and numbers",
-              },
-            })}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-          />
-          <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-          onClick = {() => setShowPassword(!showPassword)}
-          >
-          {showPassword ? <EyeOff /> : <Eye />
-
-          }
-      
-          </button>
-         </div>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              {...register("password", {
+                required: "Password is required",
+                minLength: { value: 6, message: "Minimum length is 6" },
+                pattern: {
+                  value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
+                  message: "Password must contain letters and numbers",
+                },
+              })}
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-red-500 text-sm">{errors.password.message}</p>
           )}
@@ -99,18 +113,18 @@ const Register = ({ onSubmit, serverError }) => {
           <label className="block text-sm font-medium mb-1">
             Confirm Password
           </label>
-         <div className="relative">
-         <input
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirm your password"
-            {...register("confirmPassword", {
-              required: "Please confirm your password",
-              validate: (value) =>
-                value === getValues("password") || "Passwords do not match",
-            })}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-          />
-              <button
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm your password"
+              {...register("confirmPassword", {
+                required: "Please confirm your password",
+                validate: (value) =>
+                  value === getValues("password") || "Passwords do not match",
+              })}
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+            />
+            <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
@@ -121,7 +135,7 @@ const Register = ({ onSubmit, serverError }) => {
                 <Eye className="h-5 w-5" />
               )}
             </button>
-         </div>
+          </div>
           {errors.confirmPassword && (
             <p className="text-red-500 text-sm">
               {errors.confirmPassword.message}
@@ -131,18 +145,12 @@ const Register = ({ onSubmit, serverError }) => {
 
         {/* Avatar URL */}
         <div>
-          <label className="block text-sm font-medium mb-1">Avatar URL</label>
+          <label className="block text-sm font-medium mb-1">Avatar</label>
           <input
-            type="url"
+            type="file"
             placeholder="Enter image URL"
-            {...register("avatar", {
-              required: "Avatar URL is required",
-              pattern: {
-                value: /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg))$/i,
-                message: "Avatar must be a valid image URL",
-              },
-            })}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+            {...register("avatarFile")}
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black "
           />
           {errors.avatar && (
             <p className="text-red-500 text-sm mt-1">{errors.avatar.message}</p>
