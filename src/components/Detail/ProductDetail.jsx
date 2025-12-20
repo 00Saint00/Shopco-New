@@ -3,7 +3,7 @@ import { useParams, useLocation } from "react-router-dom";
 import Spinner from "../UI/Spiner";
 import axios from "axios";
 import { Button } from "@headlessui/react";
-import Tabs from "../UI/Tabs";
+// import Tabs from "../UI/productTab";
 import Error from "../UI/Error";
 import ProductTab from "./ProductTab";
 // import RelatedProducts from "./RelatedProducts";
@@ -22,8 +22,8 @@ function ProductDetail() {
   const [reviews, setReviews] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
-   // const [cartCount, setCartCount] = useState(0);
-   const dispatch = useDispatch();
+  // const [cartCount, setCartCount] = useState(0);
+  const dispatch = useDispatch();
   // const location = useLocation();
   // const reviews = location.state?.reviews || [];
   // console.log(reviews);
@@ -147,7 +147,8 @@ function ProductDetail() {
     if (!originalPrice || !discountedPrice || originalPrice <= 0) {
       return 0;
     }
-    const discountPercent = ((originalPrice - discountedPrice) / originalPrice) * 100;
+    const discountPercent =
+      ((originalPrice - discountedPrice) / originalPrice) * 100;
     return Math.round(discountPercent); // Round to whole number
   };
 
@@ -267,16 +268,20 @@ function ProductDetail() {
                 className="w-full py-[15px] bg-black text-white rounded-[62px]"
                 onClick={() => {
                   // addToCart(product, selectedSize, quantity);
-                  dispatch(addToCart({
-                    _id: product._id,
-                    title: product.title,
-                    image: product.image,
-                    price: product.isDiscounted ? product.discountedPrice : product.price,
-                    originalPrice: product.price,
-                    quantity,
-                    size: selectedSize,
-                    category: product.category,
-                  }));
+                  dispatch(
+                    addToCart({
+                      _id: product._id,
+                      title: product.title,
+                      image: product.image,
+                      price: product.isDiscounted
+                        ? product.discountedPrice
+                        : product.price,
+                      originalPrice: product.price,
+                      quantity,
+                      size: selectedSize,
+                      category: product.category,
+                    })
+                  );
                   alert("Item added to cart!");
                 }}
               >

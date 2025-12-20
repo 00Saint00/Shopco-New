@@ -1,5 +1,5 @@
 import React from "react";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Faq from "./Faq";
 
 const ProductTab = ({ review, products }) => {
@@ -90,18 +90,24 @@ const ProductTab = ({ review, products }) => {
   return (
     <div className="py-[60px]">
       <div className="w-full">
-        <TabGroup>
-          <TabList className="flex justify-between border-b border-gray-300">
-            {categories.map(({ name }) => (
-              <Tab
-                key={name}
-                className="rounded-t-md px-0 lg:px-[129px] py-[20px] lg:py-[24px] text-[16px] lg:text-[20px] font-medium text-black border-b-2 border-transparent focus:outline-none focus:ring-0 focus:border-bottom data-[selected]:border-black data-[selected]:border-bottom"
-              >
-                {name}
-              </Tab>
-            ))}
-          </TabList>
-          <TabPanel>
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="flex justify-between border-b border-gray-300 bg-transparent p-0 h-auto w-full">
+            {categories.map(({ name }, index) => {
+              const value =
+                index === 0 ? "details" : index === 1 ? "reviews" : "faqs";
+              return (
+                <TabsTrigger
+                  key={name}
+                  value={value}
+                  className="rounded-t-md px-0 lg:px-[129px] py-[20px] lg:py-[24px] text-[16px] lg:text-[20px] font-medium text-black border-b-2 border-transparent data-[state=active]:border-black bg-transparent hover:bg-transparent data-[state=active]:bg-transparent"
+                >
+                  {name}
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+
+          <TabsContent value="details" className="mt-0">
             <div className="grid grid-cols-1 divide-y divide-gray-300">
               <div className="grid grid-cols-2 py-2">
                 <p className="text-[20px] font-bold">Brand:</p>
@@ -125,15 +131,10 @@ const ProductTab = ({ review, products }) => {
                 </p>
               </div>
             </div>
-
-            {/* <li key={products._id}>{products.title}</li> */}
-            {/* {categories[0].posts.map((post) => (
-              <li key={post.id}>{post.title}</li>
-            ))} */}
-          </TabPanel>
+          </TabsContent>
 
           {/* Ratings & Reviews Tab */}
-          <TabPanel className="mt-3 rounded-xl bg-white/5">
+          <TabsContent value="reviews" className="mt-3">
             <ul className="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
               {review.map((reviews) => (
                 <li
@@ -154,58 +155,16 @@ const ProductTab = ({ review, products }) => {
                       </p>
                     </div>
                   </div>
-
-                  {/* <p href="#" className="font-semibold">
-                    <span className="absolute inset-0" />
-                    {reviews.comment}
-                  </p> */}
-                  {/* <ul className="flex gap-2" aria-hidden="true">
-                    <li>{reviews.date}</li>
-                    <li aria-hidden="true">&middot;</li>
-                    <li>{reviews.commentCount} comments</li>
-                    <li aria-hidden="true">&middot;</li>
-                    <li>{reviews.shareCount} shares</li>
-                  </ul> */}
                 </li>
               ))}
             </ul>
-          </TabPanel>
+          </TabsContent>
 
           {/* FAQs Tab */}
-          <TabPanel className="mt-3">
-            {/* {categories[2].posts.map((post) => (
-              <li key={post.id}>{post.title}</li>
-            ))} */}
-
+          <TabsContent value="faqs" className="mt-3">
             <Faq />
-          </TabPanel>
-          {/* <TabPanels className="mt-3">
-            {categories.map(({ name, posts }) => (
-              <TabPanel key={name} className="rounded-xl bg-white/5">
-                <ul>
-                  {posts.map((post) => (
-                    <li
-                      key={post.id}
-                      className="relative rounded-md py-3 text-sm/6 transition hover:bg-white/5"
-                    >
-                      <a href="#" className="font-semibold">
-                        <span className="absolute inset-0" />
-                        {post.title}
-                      </a>
-                      <ul className="flex gap-2" aria-hidden="true">
-                        <li>{post.date}</li>
-                        <li aria-hidden="true">&middot;</li>
-                        <li>{post.commentCount} comments</li>
-                        <li aria-hidden="true">&middot;</li>
-                        <li>{post.shareCount} shares</li>
-                      </ul>
-                    </li>
-                  ))}
-                </ul>
-              </TabPanel>
-            ))}
-          </TabPanels> */}
-        </TabGroup>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

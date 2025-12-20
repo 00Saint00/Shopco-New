@@ -4,6 +4,7 @@ import axios from "axios";
 import { PencilIcon, Check, X } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../../store/slices/authSlice";
+import { account, tables, storage, config } from "../../lib/appwrite";
 
 const API_BASE = "https://api.escuelajs.co/api/v1";
 const ProfileInfo = () => {
@@ -70,56 +71,113 @@ const ProfileInfo = () => {
         email: parsedUser.email,
         avatar: parsedUser.avatar,
       });
-    } else {
-      setFormData({
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-      });
+      return;
     }
 
-    // Optional: fetch fresh data from API to stay up-to-date
-    axios
-      .get(`${API_BASE}/users/${user.id || user._id}`)
-      .then(({ data }) => {
-        if (!data || typeof data !== "object") return;
-        // Only update local state/storage when we received a valid user object
-        // setUser(data);
-        dispatch(updateUser(data));
+    const fetchUser = async () => {
+      try {
+        const accountUser = await account.get();
+
+        const mergeData = {
+          uid: accountUser.$id,
+          name: accountUser.name,
+          email: accountUser.email,
+          avatar: accountUser.prefs?.avatar || null,
+          role: accountUser.prefs?.role || "customer",
+        };
+        dispatch(updateUser(mergeData));
         setFormData({
-          name: data.name || "",
-          email: data.email || "",
-          avatar: data.avatar || "",
+          name: mergeData.name,
+          email: mergeData.email,
+          avatar: mergeData.avatar,
         });
-        try {
-          localStorage.setItem("user", JSON.stringify(data));
-          window.dispatchEvent(new Event("storageUpdate"));
-        } catch (e) {
-          console.warn("Could not persist user to localStorage", e);
-        }
-      })
-      .catch((err) => console.warn("Could not fetch fresh user data:", err));
-  }, [navigate, location, dispatch, user]);
+
+        localStorage.setItem("user", JSON.stringify(mergeData));
+        window.dispatchEvent(new Event("storageUpdate"));
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, [navigate, location, dispatch]);
+
+  // Optional: fetch fresh data from API to stay up-to-date
+  //   axios
+  //     .get(`${API_BASE}/users/${user.id || user._id}`)
+  //     .then(({ data }) => {
+  //       if (!data || typeof data !== "object") return;
+  //       // Only update local state/storage when we received a valid user object
+  //       // setUser(data);
+  //       dispatch(updateUser(data));
+  //       setFormData({
+  //         name: data.name || "",
+  //         email: data.email || "",
+  //         avatar: data.avatar || "",
+  //       });
+  //       try {
+  //         localStorage.setItem("user", JSON.stringify(data));
+  //         window.dispatchEvent(new Event("storageUpdate"));
+  //       } catch (e) {
+  //         console.warn("Could not persist user to localStorage", e);
+  //       }
+  //     })
+  //     .catch((err) => console.warn("Could not fetch fresh user data:", err));
+  // }, [navigate, location, dispatch, user]);
+
+  // const handleSave = async () => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) return;
+
+  //   try {
+  //     const { data } = await axios.put(
+  //       `${API_BASE}/users/${user.id || user._id}`,
+  //       // { ...user, name: nameInput },
+  //       { ...user, ...formData },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     // setUser(data);
+  //     // localStorage.setItem("user", JSON.stringify(data));
+  //     dispatch(updateUser(data));
+  //     setIsEditing(false);
+  //     setServerError(null);
+  //   } catch (err) {
+  //     setServerError(err.response?.data?.message || "Update failed");
+  //   }
+  // };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
+    if (!user) return;
     try {
-      const { data } = await axios.put(
-        `${API_BASE}/users/${user.id || user._id}`,
-        // { ...user, name: nameInput },
-        { ...user, ...formData },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      if (isEditing === "name") {
+        await account.updateName(formData.name);
+      }
+      if (isEditing === "avatar") {
+        await account.updatePrefs({ avatar: formData.avatar });
+      }
 
-      // setUser(data);
-      // localStorage.setItem("user", JSON.stringify(data));
-      dispatch(updateUser(data));
-      setIsEditing(false);
+      const updatedUser = await account.get();
+      const userData = {
+        uid: updatedUser.$id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        avatar: updatedUser.prefs?.avatar || null,
+        role: updatedUser.prefs?.role || "customer",
+      };
+
+      // Update everything
+      dispatch(updateUser(userData));
+      localStorage.setItem("user", JSON.stringify(userData));
+      setFormData({
+        name: userData.name,
+        email: userData.email,
+        avatar: userData.avatar,
+      });
+
+      setIsEditing(null);
       setServerError(null);
-    } catch (err) {
-      setServerError(err.response?.data?.message || "Update failed");
+    } catch (error) {
+      console.error("Error updating user:", error);
     }
   };
 
@@ -217,41 +275,7 @@ const ProfileInfo = () => {
         )}
       </div>
       <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "email" ? (
-          <>
-            <input
-              name="email"
-              className="border rounded px-2 py-2 text-[20px]"
-              value={formData.email}
-              // onChange={(e) => setNameInput(e.target.value)}
-              onChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-            />
-            <button
-              className="text-green-600 hover:text-green-800"
-              onClick={handleSave}
-            >
-              <Check className="h-5 w-5" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-800"
-              onClick={handleCancel}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="text-[25px] font-semibold">{user.email}</span>
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("email")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </>
-        )}
+        <span className="text-[25px] font-semibold">{user.email}</span>
       </div>
 
       {serverError && <p className="text-red-500">{serverError}</p>}

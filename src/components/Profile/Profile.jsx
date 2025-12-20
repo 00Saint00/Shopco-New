@@ -5,46 +5,56 @@ import ChangePassword from "./ChangePassword";
 import axios from "axios";
 import { Button } from "@headlessui/react";
 import { TruckElectricIcon } from "lucide-react";
+import { account } from "../../lib/appwrite";
 // import Orders from "./Orders";
-
-const API_BASE = "https://api.escuelajs.co/api/v1";
-const CHANGE_PASSWORD_URL = `${API_BASE}/auth/change-password`;
 
 const Profile = () => {
   const [serverError, setServerError] = useState(null);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
+  // const handleSubmit = async (formData) => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     setServerError("You must be logged in to change your password");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Get user ID from localStorage
+  //     const storedUser = JSON.parse(localStorage.getItem("user"));
+  //     const userId = storedUser?.id || storedUser?._id;
+
+  //     if (!userId) {
+  //       setServerError("User ID not found");
+  //       return;
+  //     }
+
+  //     // Update password - send only the new password to the API
+  //     const { data: responseData } = await axios.put(
+  //       `${API_BASE}/users/${userId}`,
+  //       { password: formData.newPassword },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     console.log("Password changed successfully:", responseData);
+  //     setServerError(null);
+  //     setShowChangePassword(false);
+
+  //     // Optionally: show success message or reset form
+  //   } catch (err) {
+  //     setServerError(err.response?.data?.message || "Change password failed");
+  //   }
+  // };
+
   const handleSubmit = async (formData) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setServerError("You must be logged in to change your password");
-      return;
-    }
-
     try {
-      // Get user ID from localStorage
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      const userId = storedUser?.id || storedUser?._id;
-
-      if (!userId) {
-        setServerError("User ID not found");
-        return;
-      }
-
-      // Update password - send only the new password to the API
-      const { data: responseData } = await axios.put(
-        `${API_BASE}/users/${userId}`,
-        { password: formData.newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      console.log("Password changed successfully:", responseData);
+      await account.updatePassword(formData.newPassword, formData.oldPassword);
+      console.log("Password changed successfully");
       setServerError(null);
       setShowChangePassword(false);
-
-      // Optionally: show success message or reset form
-    } catch (err) {
-      setServerError(err.response?.data?.message || "Change password failed");
+    } catch (error) {
+      console.error("Password change failed:", error);
+      setServerError("Incorrect old password. Please try again.");
     }
   };
 

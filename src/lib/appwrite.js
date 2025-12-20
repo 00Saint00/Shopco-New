@@ -1,11 +1,11 @@
 import { Client, Account, TablesDB, Storage, ID, Avatars } from "appwrite";
 
 export const config = {
-  endpoint: "https://nyc.cloud.appwrite.io/v1",
-  projectId: "693de5b200399881a9bc",
-  databaseId: "693def5500321182fc67",
-  usersTableId: "users",
-  storageId: "693df3630001a4c807f8", // Update this with your actual storage bucket ID
+  endpoint: import.meta.env.VITE_APPWRITE_ENDPOINT,
+  projectId: import.meta.env.VITE_APPWRITE_PROJECT_ID,
+  databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID,
+  usersTableId: import.meta.env.VITE_APPWRITE_USERS_TABLE_ID,
+  storageId: import.meta.env.VITE_APPWRITE_STORAGE_ID,
 };
 
 export const client = new Client();

@@ -287,7 +287,7 @@ const Header = () => {
             <Menu as="div" className="relative inline-block text-left">
               {({ open }) => (
                 <>
-                  <Menu.Button className="flex items-center gap-2 focus:outline-none">
+                  <Menu.Button className="flex items-center gap-2 focus:outline-none cursor-pointer">
                     {user.avatar ? (
                       <img
                         src={user.avatar}
