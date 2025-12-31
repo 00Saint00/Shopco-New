@@ -114,7 +114,10 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/products/:id/:slug" element={<ProductDetail />} />
               <Route path="/shop/:sortBy?" element={<Shop />} />
-              <Route path="/category/:categoryName/:sortBy?" element={<Shop />} />
+              <Route
+                path="/category/:categoryName/:sortBy?"
+                element={<Shop />}
+              />
               <Route path="/on-sale/:sortBy?" element={<Shop />} />
               <Route
                 path="/login"
