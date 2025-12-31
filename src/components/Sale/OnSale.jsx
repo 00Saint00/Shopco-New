@@ -2,9 +2,9 @@ import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Spinner from "../ui/Spiner";
-import Error from "../ui/Error";
-import Card from "../ui/Card";
+import Spinner from "../ui/Spiner.jsx";
+import Error from "../ui/Error.jsx";
+import Card from "../ui/Card.jsx";
 import { applyDailyDiscounts } from "../Utils/discountUtils";
 
 // Memoize slugify function outside component

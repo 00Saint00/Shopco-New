@@ -1,10 +1,10 @@
 import React, { Suspense } from "react";
-import Card from "../../ui/Card";
+import Card from "../../ui/Card.jsx";
 import { Button } from "@headlessui/react";
 import "swiper/css"; // global CSS imported in main.jsx but keep here as safe-guard if needed
 import "swiper/css/autoplay";
 import { Link } from "react-router-dom";
-import Spinner from "../../ui/Spiner";
+import Spinner from "../../ui/Spiner.jsx";
 
 const TopSellingSwiper = React.lazy(() => import("./TopSellingSwiper"));
 

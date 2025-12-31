@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import Spinner from "../ui/Spiner";
+import Spinner from "../ui/Spiner.jsx";
 import axios from "axios";
 import { Button } from "@headlessui/react";
 // import Tabs from "../UI/productTab";
-import Error from "../ui/Error";
+import Error from "../ui/Error.jsx";
 import ProductTab from "./ProductTab";
 // import RelatedProducts from "./RelatedProducts";
 // import { addToCart } from "../Utils/CartUtils";

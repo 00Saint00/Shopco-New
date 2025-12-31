@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import Spinner from "../../ui/Spiner";
+import Spinner from "../../ui/Spiner.jsx";
 
 const LatestArrivalSwiper = React.lazy(() => import("./LatestArrivalSwiper"));
 
