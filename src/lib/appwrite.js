@@ -1,11 +1,11 @@
 import { Client, Account, TablesDB, Storage, ID, Avatars } from "appwrite";
 
 export const config = {
-  endpoint: import.meta.env.VITE_APPWRITE_ENDPOINT,
-  projectId: import.meta.env.VITE_APPWRITE_PROJECT_ID,
-  databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID,
-  usersTableId: import.meta.env.VITE_APPWRITE_USERS_TABLE_ID,
-  storageId: import.meta.env.VITE_APPWRITE_STORAGE_ID,
+  endpoint: import.meta.env.APPWRITE_ENDPOINT,
+  projectId: import.meta.env.APPWRITE_PROJECT_ID,
+  databaseId: import.meta.env.APPWRITE_DATABASE_ID,
+  usersTableId: import.meta.env.APPWRITE_USERS_TABLE_ID,
+  storageId: import.meta.env.APPWRITE_STORAGE_ID,
 };
 
 export const client = new Client();
