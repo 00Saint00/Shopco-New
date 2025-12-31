@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import Spinner from "../UI/Spiner";
-import Error from "../UI/Error";
-import Card from "../UI/Card";
+import Spinner from "../ui/Spiner";
+import Error from "../ui/Error";
+import Card from "../ui/Card";
 import { Link } from "react-router-dom";
 import { applyDailyDiscounts } from "../Utils/discountUtils";
 import { Menu } from "@headlessui/react";
@@ -24,7 +24,7 @@ const Shop = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch products once on mount  
+  // Fetch products once on mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -49,17 +49,21 @@ const Shop = () => {
 
     // Filter products - check for on-sale first, then category
     let filteredProducts = [...allProducts];
-    
+
     // Check if we're on the /on-sale route
-    if (location.pathname === "/on-sale" || location.pathname.startsWith("/on-sale/")) {
+    if (
+      location.pathname === "/on-sale" ||
+      location.pathname.startsWith("/on-sale/")
+    ) {
       filteredProducts = filteredProducts.filter(
         (product) => product.isDiscounted === true
       );
-    } 
+    }
     // Otherwise, filter by category if categoryName exists (for men/women)
     else if (categoryName) {
       filteredProducts = filteredProducts.filter(
-        (product) => product.category?.toLowerCase() === categoryName.toLowerCase()
+        (product) =>
+          product.category?.toLowerCase() === categoryName.toLowerCase()
       );
     }
 
@@ -93,7 +97,8 @@ const Shop = () => {
     <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[168px]">
       <div className="flex lg:justify-between mb-6">
         <h2 className="text-[24px] lg:text-[32px] font-bold mb-[16px]">
-          {location.pathname === "/on-sale" || location.pathname.startsWith("/on-sale/")
+          {location.pathname === "/on-sale" ||
+          location.pathname.startsWith("/on-sale/")
             ? "Items on Sale"
             : categoryName
             ? categoryName.charAt(0).toUpperCase() + categoryName.slice(1)
@@ -129,12 +134,14 @@ const Shop = () => {
                               active ? "bg-blue-100" : ""
                             }`}
                             onClick={() => {
-                              if (location.pathname === "/on-sale" || location.pathname.startsWith("/on-sale/")) {
+                              if (
+                                location.pathname === "/on-sale" ||
+                                location.pathname.startsWith("/on-sale/")
+                              ) {
                                 navigate(`/on-sale/${key}`);
                               } else if (categoryName) {
                                 navigate(`/category/${categoryName}/${key}`);
-                              }
-                               else {
+                              } else {
                                 navigate(`/shop/${key}`);
                               }
                             }}

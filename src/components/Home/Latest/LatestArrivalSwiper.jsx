@@ -1,7 +1,7 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import Card from "../../UI/Card";
+import Card from "../../ui/Card";
 import { Button } from "@headlessui/react";
 import { Link } from "react-router-dom";
 

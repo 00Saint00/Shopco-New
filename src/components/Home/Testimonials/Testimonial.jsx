@@ -8,7 +8,7 @@ import axios from "axios";
 import "swiper/css";
 import "swiper/css/autoplay";
 import "swiper/css/navigation";
-import Spinner from "../../UI/Spiner";
+import Spinner from "../../ui/Spiner";
 
 function Testimonials({ reviews }) {
   const prevRef = useRef(null);

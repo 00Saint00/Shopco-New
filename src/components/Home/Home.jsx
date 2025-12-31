@@ -13,7 +13,7 @@ import { Autoplay } from "swiper/modules";
 
 // Direct imports — Vite will handle code splitting automatically
 import Banner from "./Banner/Banner";
-import Spinner from "../UI/Spiner";
+import Spinner from "../ui/Spiner";
 const DressStyles = React.lazy(() => import("./Dress Style/DressStyle"));
 const Testimonials = React.lazy(() => import("./Testimonials/Testimonial"));
 

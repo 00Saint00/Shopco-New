@@ -2,11 +2,10 @@ import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Spinner from "../UI/Spiner";
-import Error from "../UI/Error";
-import Card from "../UI/Card";
+import Spinner from "../ui/Spiner";
+import Error from "../ui/Error";
+import Card from "../ui/Card";
 import { applyDailyDiscounts } from "../Utils/discountUtils";
-
 
 // Memoize slugify function outside component
 const slugify = (text) =>
@@ -16,7 +15,7 @@ const slugify = (text) =>
     .replace(/[^\w-]+/g, "");
 
 const OnSale = () => {
-  const [allProducts,setAllProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -38,7 +37,9 @@ const OnSale = () => {
     fetchProducts();
   }, []);
 
-const discountedProduts = allProducts.filter((product) => product.isDiscounted === true)
+  const discountedProduts = allProducts.filter(
+    (product) => product.isDiscounted === true
+  );
 
   return (
     <div className="px-[16px] lg:px-[100px] pt-[80px] pb-[50%] md:pb-[25%] lg:pb-[168px]">
@@ -46,12 +47,12 @@ const discountedProduts = allProducts.filter((product) => product.isDiscounted =
         <h2>Items on Sale</h2>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-[80px]">
-        {discountedProduts.map((product) => ( 
+        {discountedProduts.map((product) => (
           <Link
-          key={product._id}
-          to={`/products/${product._id}/${slugify(product.title)}`}
+            key={product._id}
+            to={`/products/${product._id}/${slugify(product.title)}`}
           >
-          <Card {...product}/>
+            <Card {...product} />
           </Link>
         ))}
       </div>
