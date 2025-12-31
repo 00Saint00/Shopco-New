@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import Spinner from "../ui/spinner.jsx";
+import Spinner from "../UI/spinner.jsx";
 import Error from "../UI/Error.jsx";
 import Card from "../UI/Card.jsx";
 import { Link } from "react-router-dom";

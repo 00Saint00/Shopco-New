@@ -4,7 +4,7 @@ import { Button } from "@headlessui/react";
 import "swiper/css"; // global CSS imported in main.jsx but keep here as safe-guard if needed
 import "swiper/css/autoplay";
 import { Link } from "react-router-dom";
-import Spinner from "../../ui/spinner.jsx";
+import Spinner from "../../UI/spinner.jsx";
 
 const TopSellingSwiper = React.lazy(() => import("./TopSellingSwiper"));
 

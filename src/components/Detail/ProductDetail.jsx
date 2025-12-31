@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import Spinner from "../ui/spinner.jsx";
+import Spinner from "../UI/spinner.jsx";
 import axios from "axios";
 import { Button } from "@headlessui/react";
 // import Tabs from "../UI/productTab";
