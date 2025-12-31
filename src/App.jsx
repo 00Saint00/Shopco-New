@@ -11,7 +11,7 @@ import { loadUserFromStorage, logout } from "./store/slices/authSlice";
 import Header from "./components/Header/Header";
 import Home from "./components/Home/Home";
 import Footer from "./components/Footer/Footer";
-import Spinner from "./components/ui/Spiner.jsx";
+import Spinner from "@/components/ui/spinner.jsx";
 import AuthRoute from "./components/Utils/AuthRoute.jsx";
 // import OnSale from "./components/Sale/OnSale.jsx";
 

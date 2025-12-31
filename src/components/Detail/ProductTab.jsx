@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs.jsx";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../UI/Tabs.jsx";
 import Faq from "./Faq";
 
 const ProductTab = ({ review, products }) => {

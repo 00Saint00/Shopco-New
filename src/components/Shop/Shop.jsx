@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import Spinner from "../ui/Spiner.jsx";
-import Error from "../ui/Error.jsx";
-import Card from "../ui/Card.jsx";
+import Spinner from "../ui/spinner.jsx";
+import Error from "../UI/Error.jsx";
+import Card from "../UI/Card.jsx";
 import { Link } from "react-router-dom";
 import { applyDailyDiscounts } from "../Utils/discountUtils";
 import { Menu } from "@headlessui/react";
