@@ -333,7 +333,7 @@ const Header = () => {
                       )}
                     </Menu.Item>
 
-                    {user.role === "admin" && (
+                    {user.role === "seller" && (
                       <Menu.Item>
                         {({ active }) => (
                           <Link

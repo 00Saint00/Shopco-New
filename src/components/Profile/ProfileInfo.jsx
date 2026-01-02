@@ -167,7 +167,6 @@ const ProfileInfo = () => {
           userRole !== "seller"
         ) {
           try {
-
             // await account.updatePrefs({ role: "seller" });
 
             try {
@@ -417,18 +416,40 @@ const ProfileInfo = () => {
       }
 
       const updatedUser = await account.get();
-      const customerRow = await tables.getRow({
-        databaseId: config.databaseId,
-        tableId: config.customersTableId,
-        rowId: updatedUser.$id,
-      });
+
+      // Fetch customer row (with error handling)
+      let customerRow = null;
+      try {
+        customerRow = await tables.getRow({
+          databaseId: config.databaseId,
+          tableId: config.customersTableId,
+          rowId: updatedUser.$id,
+        });
+      } catch (error) {
+        console.log("Customer row doesn't exist yet");
+        customerRow = null;
+      }
+
+      // Fetch role from database table (usersTableId) - role is stored as enum in database
+      let userRole = "customer"; // default
+      try {
+        const userRow = await tables.getRow({
+          databaseId: config.databaseId,
+          tableId: config.usersTableId,
+          rowId: updatedUser.$id,
+        });
+        userRole = userRow?.role || "customer";
+      } catch (error) {
+        console.error("Error fetching user role from database:", error);
+        // Default to "customer" if row doesn't exist
+      }
 
       const userData = {
         uid: updatedUser.$id,
         name: updatedUser.name,
         email: updatedUser.email,
         avatar: updatedUser.prefs?.avatar || null,
-        role: updatedUser.prefs?.role || "customer",
+        role: userRole, // ✅ Get role from database table
         phone: customerRow?.phone || "",
         address: customerRow?.address || "",
         city: customerRow?.city || "",
