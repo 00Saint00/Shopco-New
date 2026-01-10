@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Tab } from "@headlessui/react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../UI/Tabs.jsx";
 import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import axios from "axios";
@@ -60,72 +60,55 @@ const Profile = () => {
 
   return (
     <div className="flex flex-col lg:flex-row px-[16px] lg:px-[100px] pt-[80px] pb-[90%] lg:pb-[168px]">
-      <Tab.Group className="w-full">
+      <Tabs
+        defaultValue="profile"
+        className="w-full flex flex-col lg:flex-row gap-0"
+      >
         <div className="flex flex-col lg:flex-row w-full">
           {/* Sidebar / Top nav */}
-          <Tab.List className="w-full lg:w-44 lg:border-r lg:pr-6 mb-6 lg:mb-0">
-            <ul className="flex lg:flex-col space-x-4 lg:space-x-0 lg:space-y-4 overflow-x-auto">
-              <li>
-                <Tab
-                  className={({ selected }) =>
-                    `block px-4 py-2 rounded ${
-                      selected ? "bg-black text-white font-bold" : ""
-                    }`
-                  }
-                >
-                  Profile
-                </Tab>
-              </li>
-              <li>
-                <Tab
-                  className={({ selected }) =>
-                    `block px-4 py-2 rounded ${
-                      selected ? "bg-black text-white font-bold" : ""
-                    }`
-                  }
-                >
-                  Orders
-                </Tab>
-              </li>
-              <li>
-                <Tab
-                  className={({ selected }) =>
-                    `block px-4 py-2 rounded ${
-                      selected ? "bg-black text-white font-bold" : ""
-                    }`
-                  }
-                >
-                  Wishlist
-                </Tab>
-              </li>
-              <li>
-                <Tab
-                  className={({ selected }) =>
-                    `block px-4 py-2 rounded ${
-                      selected ? "bg-black text-white font-bold" : ""
-                    }`
-                  }
-                >
-                  Settings
-                </Tab>
-              </li>
-            </ul>
-          </Tab.List>
+          <div className="w-full lg:w-44 lg:border-r lg:pr-6 mb-6 lg:mb-0 shrink-0">
+            <TabsList className="flex lg:flex-col space-x-4 lg:space-x-0 lg:space-y-4 overflow-x-auto bg-transparent p-0 h-auto w-full rounded-none">
+              <TabsTrigger
+                value="profile"
+                className="block px-4 py-2 rounded-none data-[state=active]:bg-black data-[state=active]:text-white font-bold w-full justify-start"
+              >
+                Profile
+              </TabsTrigger>
+              <TabsTrigger
+                value="orders"
+                className="block px-4 py-2 rounded-none data-[state=active]:bg-black data-[state=active]:text-white font-bold w-full justify-start"
+              >
+                Orders
+              </TabsTrigger>
+              <TabsTrigger
+                value="wishlist"
+                className="block px-4 py-2 rounded-none data-[state=active]:bg-black data-[state=active]:text-white font-bold w-full justify-start"
+              >
+                Wishlist
+              </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="block px-4 py-2 rounded-none data-[state=active]:bg-black data-[state=active]:text-white font-bold w-full justify-start"
+              >
+                Settings
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Main content */}
-          <Tab.Panels className="flex-1 lg:pl-8 w-full">
-            <Tab.Panel>
+          <div className="flex-1 lg:pl-8 w-full min-w-0">
+            <TabsContent value="profile" className="mt-0 outline-none">
               <div>
                 <ProfileInfo />
               </div>
-            </Tab.Panel>
-            <Tab.Panel>
+            </TabsContent>
+            <TabsContent value="orders" className="mt-0 outline-none">
               <div>{/* <Orders /> */}</div>
-            </Tab.Panel>
-            <Tab.Panel>
+            </TabsContent>
+            <TabsContent value="wishlist" className="mt-0 outline-none">
               <div>Your wishlist here</div>
-            </Tab.Panel>
-            <Tab.Panel>
+            </TabsContent>
+            <TabsContent value="settings" className="mt-0 outline-none">
               <div>
                 {/* SETTINGS PANEL */}
                 {!showChangePassword ? (
@@ -179,10 +162,10 @@ const Profile = () => {
                   </div>
                 )}
               </div>
-            </Tab.Panel>
-          </Tab.Panels>
+            </TabsContent>
+          </div>
         </div>
-      </Tab.Group>
+      </Tabs>
     </div>
   );
 };

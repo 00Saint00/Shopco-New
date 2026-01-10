@@ -13,6 +13,7 @@ import Home from "./components/Home/Home";
 import Footer from "./components/Footer/Footer";
 import Spinner from "@/components/UI/spinner.jsx";
 import AuthRoute from "./components/Utils/AuthRoute.jsx";
+import Checkout from "./components/Checkout/Checkout";
 // import OnSale from "./components/Sale/OnSale.jsx";
 
 // Lazy load routes - only load when needed (reduces initial bundle size)
@@ -136,6 +137,7 @@ function App() {
                 }
               />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
             </Routes>
           </Suspense>
         </div>

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
 // import { addToCart, removeFromCart } from "../Utils/CartUtils";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart,clearCart, addToCart } from "../../store/slices/cartSlice";
+import {
+  removeFromCart,
+  clearCart,
+  addToCart,
+} from "../../store/slices/cartSlice";
 
 // import trash
 
 const Cart = () => {
   // const [cart, setCart] = useState([]);
-const dispatch = useDispatch();
-const cart = useSelector((state) => state.cart.cart);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const cart = useSelector((state) => state.cart.cart);
 
   // Fetch cart from localStorage when component mounts
   // const loadCart = () => {
@@ -28,18 +34,25 @@ const cart = useSelector((state) => state.cart.cart);
   const handleIncrease = (item) => {
     // addToCart(item, item.size, 1); // add 1 more of same product
     // loadCart();
-    dispatch(addToCart({
-      ...item,
-      quantity: 1, // add 1 more
-    }));
+    dispatch(
+      addToCart({
+        ...item,
+        quantity: 1, // add 1 more
+      })
+    );
   };
 
   const handleDecrease = (item) => {
-    // 
-    dispatch(removeFromCart({
-      ...item,
-      quantity: -1,
-    }))
+    //
+    dispatch(
+      removeFromCart({
+        // ...item,
+        // quantity: -1,
+
+        _id: item._id,
+        size: item.size,
+      })
+    );
   };
 
   return (
@@ -105,9 +118,17 @@ const cart = useSelector((state) => state.cart.cart);
               </div>
             ))}
 
-            <div className="flex justify-end pt-6 mt-4">
-              <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
-            </div>
+            {cart.length > 0 && (
+              <div className="flex justify-between items-center pt-6 mt-4">
+                <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
+                <Button
+                  onClick={() => navigate("/checkout")}
+                  className="bg-black text-white px-[40px] py-[15px] rounded-[62px] font-semibold hover:bg-gray-600 transition duration-300 cursor-pointer"
+                >
+                  Proceed to Checkout
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

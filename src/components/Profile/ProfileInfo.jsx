@@ -10,7 +10,7 @@ import {
   updateSellersProfile,
 } from "../../services/authservice";
 
-const API_BASE = "https://api.escuelajs.co/api/v1";
+// const API_BASE = "https://api.escuelajs.co/api/v1";
 const ProfileInfo = () => {
   // const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(null);

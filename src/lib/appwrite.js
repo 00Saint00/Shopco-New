@@ -8,6 +8,7 @@ export const config = {
   customersTableId: import.meta.env.VITE_APPWRITE_CUSTOMERS_TABLE_ID,
   sellersTableId: import.meta.env.VITE_APPWRITE_SELLERS_TABLE_ID,
   storageId: import.meta.env.VITE_APPWRITE_STORAGE_ID,
+  ordersTableId: import.meta.env.VITE_APPWRITE_ORDERS_TABLE_ID,
 };
 
 export const client = new Client();
