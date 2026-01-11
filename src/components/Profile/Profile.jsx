@@ -6,7 +6,7 @@ import axios from "axios";
 import { Button } from "@headlessui/react";
 import { TruckElectricIcon } from "lucide-react";
 import { account } from "../../lib/appwrite";
-// import Orders from "./Orders";
+import Order from "./Order";
 
 const Profile = () => {
   const [serverError, setServerError] = useState(null);
@@ -103,7 +103,9 @@ const Profile = () => {
               </div>
             </TabsContent>
             <TabsContent value="orders" className="mt-0 outline-none">
-              <div>{/* <Orders /> */}</div>
+              <div>
+                <Order />
+              </div>
             </TabsContent>
             <TabsContent value="wishlist" className="mt-0 outline-none">
               <div>Your wishlist here</div>
