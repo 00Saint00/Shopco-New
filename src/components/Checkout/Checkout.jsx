@@ -16,45 +16,17 @@ const Checkout = () => {
   const [orderError, setOrderError] = useState(null);
 
   const handlePlaceOrder = async () => {
-    console.log("=== PLACE ORDER DEBUG ===");
-    console.log("1. Cart items:", cart);
-    console.log("2. Cart length:", cart.length);
-    console.log("3. Total:", total);
-
     if (cart.length === 0) {
       alert("Your cart is empty!");
       return;
     }
-
-    console.log("4. User object:", user);
-    console.log("5. User address fields:", {
-      address: user?.address,
-      city: user?.city,
-      state: user?.state,
-      country: user?.country,
-      phone: user?.phone,
-      name: user?.name,
-      email: user?.email,
-    });
 
     // Check if user has address (handle empty strings too)
     const hasAddress = user?.address && user.address.trim() !== "";
     const hasCity = user?.city && user.city.trim() !== "";
     const hasState = user?.state && user.state.trim() !== "";
 
-    console.log("6. Address validation:", {
-      hasAddress,
-      hasCity,
-      hasState,
-      allValid: hasAddress && hasCity && hasState,
-    });
-
     if (!hasAddress || !hasCity || !hasState) {
-      console.log("7. ❌ VALIDATION FAILED - Missing fields:", {
-        missingAddress: !hasAddress,
-        missingCity: !hasCity,
-        missingState: !hasState,
-      });
       alert(
         "Please complete your shipping address first! Click 'Edit Address' to add your address details."
       );
@@ -76,22 +48,12 @@ const Checkout = () => {
       country: user.country || "",
     };
 
-    console.log("7. ✅ VALIDATION PASSED");
-    console.log("8. Shipping address object:", shippingAddress);
-    console.log("9. Data to be sent to createOrder:", {
-      items: cart,
-      total: total,
-      shippingAddress: shippingAddress,
-    });
-
     // Create order
     const result = await createOrder({
       items: cart,
       total: total,
       shippingAddress: shippingAddress,
     });
-
-    console.log("10. Order creation result:", result);
 
     if (result.success) {
       // Clear cart
