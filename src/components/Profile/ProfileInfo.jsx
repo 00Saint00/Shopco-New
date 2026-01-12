@@ -122,30 +122,18 @@ const ProfileInfo = () => {
           // Default to "customer" if row doesn't exist
         }
 
+        // Fetch customer data for all users (sellers can also have phone/address)
         let customerRow = null;
-        //customer
-        if (userRole === "customer") {
-          try {
-            customerRow = await tables.getRow({
-              databaseId: config.databaseId,
-              tableId: config.customersTableId,
-              rowId: accountUser.$id,
-            });
-          } catch (error) {
-            console.log("Customer row doesn't exist yet, using empty values");
-            customerRow = null;
-          }
+        try {
+          customerRow = await tables.getRow({
+            databaseId: config.databaseId,
+            tableId: config.customersTableId,
+            rowId: accountUser.$id,
+          });
+        } catch (error) {
+          // Customer row doesn't exist yet, that's okay
+          customerRow = null;
         }
-        // try {
-        //   customerRow = await tables.getRow({
-        //     databaseId: config.databaseId,
-        //     tableId: config.customersTableId,
-        //     rowId: accountUser.$id,
-        //   });
-        // } catch (error) {
-        //   console.log("Customer row doesn't exist yet, using empty values");
-        //   customerRow = null;
-        // }
         // seller
         let sellerRow = null;
         // if (userRole === "seller") {
@@ -246,8 +234,6 @@ const ProfileInfo = () => {
           shopAddress: mergeData.shopAddress,
           verified: mergeData.verified,
         });
-
-        console.log("🔍 Current User Data:", mergeData);
 
         localStorage.setItem("user", JSON.stringify(mergeData));
         window.dispatchEvent(new Event("storageUpdate"));
@@ -626,7 +612,7 @@ const ProfileInfo = () => {
         ) : (
           <>
             <span className="text-[25px] font-semibold">
-              {user.phone || "Enter Mobile Number"}
+              {user?.phone || "Enter Mobile Number"}
             </span>
             <button
               className="text-gray-500 hover:text-gray-700"

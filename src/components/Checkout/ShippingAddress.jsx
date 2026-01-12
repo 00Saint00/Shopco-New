@@ -13,6 +13,7 @@ const ShippingAddress = () => {
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     fullName: user?.name || "",
     email: user?.email || "",
@@ -64,7 +65,7 @@ const ShippingAddress = () => {
 
   useEffect(() => {
     if (user) {
-      reset({
+      const resetData = {
         fullName: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
@@ -72,7 +73,8 @@ const ShippingAddress = () => {
         city: user.city || "",
         state: user.state || "",
         country: user.country || "",
-      });
+      };
+      reset(resetData);
     }
   }, [user, reset]);
 
@@ -276,14 +278,14 @@ const ShippingAddress = () => {
             >
               Edit Address
             </button>
-            <button
+            {/* <button
               onClick={handleSubmit(formSubmit)}
               type="submit"
               disabled={isSubmitting}
               className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition disabled:opacity-60 mt-3"
             >
               {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
+            </button> */}
           </div>
         )}
       </div>

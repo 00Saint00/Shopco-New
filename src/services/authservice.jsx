@@ -136,6 +136,17 @@ export const loginUser = async ({ email, password }) => {
       // Default to "customer" if row doesn't exist
     }
 
+    let customerRow = null;
+    try {
+      customerRow = await tables.getRow({
+        databaseId: config.databaseId,
+        tableId: config.customersTableId,
+        rowId: user.$id,
+      });
+    } catch (error) {
+      // Customer row doesn't exist yet, that's okay
+    }
+
     // Map Appwrite user to your expected structure
     const userData = {
       uid: user.$id,
@@ -143,6 +154,11 @@ export const loginUser = async ({ email, password }) => {
       email: user.email,
       role: userRole, // ✅ Get role from database table (enum)
       avatar: user.prefs?.avatar || null,
+      phone: customerRow?.phone || "",
+      address: customerRow?.address || "",
+      city: customerRow?.city || "",
+      state: customerRow?.state || "",
+      country: customerRow?.country || "",
     };
 
     //if seller,fetch seller data
