@@ -292,7 +292,7 @@ const Header = () => {
                       <img
                         src={user.avatar}
                         alt={user.name}
-                        className="h-[32px] w-[32px] rounded-full"
+                        className="h-[32px] w-[32px] rounded-full object-cover"
                         loading="lazy"
                       />
                     ) : (

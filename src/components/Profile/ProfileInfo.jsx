@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { PencilIcon, Check, X } from "lucide-react";
+import { PencilIcon, Check, X, Minus } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../../store/slices/authSlice";
 import { account, tables, storage, config, ID } from "../../lib/appwrite";
@@ -37,6 +37,9 @@ const ProfileInfo = () => {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
   const [showSellerForm, setShowSellerForm] = useState(false);
+  const [editMode , setEditMode] = useState(false);
+  const [isEditingSeller, setIsEditingSeller] = useState(false);
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -347,58 +350,149 @@ const ProfileInfo = () => {
     }
   };
 
-  const handleSave = async () => {
+  // const handleSave = async () => {
+  //   if (!user) return;
+  //   try {
+  //     if (isEditing === "name") {
+  //       await account.updateName(formData.name);
+  //     }
+  //     if (isEditing === "avatar") {
+  //       let avatarUrl = formData.avatar;
+
+  //       // If a file was selected, upload it to Appwrite Storage
+  //       if (avatarFile) {
+  //         try {
+  //           const fileId = ID.unique();
+  //           console.log("📤 Uploading avatar file...");
+
+  //           // Upload file to Appwrite Storage
+  //           await storage.createFile(config.storageId, fileId, avatarFile);
+
+  //           // Get public URL for the uploaded file
+  //           avatarUrl = `${config.endpoint}/storage/buckets/${config.storageId}/files/${fileId}/view?project=${config.projectId}`;
+
+  //           console.log("✅ Avatar uploaded:", avatarUrl);
+  //         } catch (uploadError) {
+  //           console.error("❌ Avatar upload error:", uploadError);
+  //           setServerError("Failed to upload avatar. Please try again.");
+  //           return;
+  //         }
+  //       }
+
+  //       // Update account preferences with the avatar URL
+  //       await account.updatePrefs({ avatar: avatarUrl });
+  //     }
+
+  //     if (
+  //       isEditing === "phone" ||
+  //       isEditing === "address" ||
+  //       isEditing === "city" ||
+  //       isEditing === "state" ||
+  //       isEditing === "country"
+  //     ) {
+  //       const result = await updateUserProfile({
+  //         phone: formData.phone,
+  //         address: formData.address,
+  //         city: formData.city,
+  //         state: formData.state,
+  //         country: formData.country,
+  //       });
+
+  //       if (!result.success) {
+  //         setServerError(result.error);
+  //         return; // Stop here if update failed
+  //       }
+  //     }
+
+  //     const updatedUser = await account.get();
+
+  //     // Fetch customer row (with error handling)
+  //     let customerRow = null;
+  //     try {
+  //       customerRow = await tables.getRow({
+  //         databaseId: config.databaseId,
+  //         tableId: config.customersTableId,
+  //         rowId: updatedUser.$id,
+  //       });
+  //     } catch (error) {
+  //       console.log("Customer row doesn't exist yet");
+  //       customerRow = null;
+  //     }
+
+  //     // Fetch role from database table (usersTableId) - role is stored as enum in database
+  //     let userRole = "customer"; // default
+  //     try {
+  //       const userRow = await tables.getRow({
+  //         databaseId: config.databaseId,
+  //         tableId: config.usersTableId,
+  //         rowId: updatedUser.$id,
+  //       });
+  //       userRole = userRow?.role || "customer";
+  //     } catch (error) {
+  //       console.error("Error fetching user role from database:", error);
+  //       // Default to "customer" if row doesn't exist
+  //     }
+
+  //     const userData = {
+  //       uid: updatedUser.$id,
+  //       name: updatedUser.name,
+  //       email: updatedUser.email,
+  //       avatar: updatedUser.prefs?.avatar || null,
+  //       role: userRole, // ✅ Get role from database table
+  //       phone: customerRow?.phone || "",
+  //       address: customerRow?.address || "",
+  //       city: customerRow?.city || "",
+  //       state: customerRow?.state || "",
+  //       country: customerRow?.country || "",
+  //     };
+
+  //     // Update everything
+  //     dispatch(updateUser(userData));
+  //     localStorage.setItem("user", JSON.stringify(userData));
+  //     setFormData({
+  //       name: userData.name,
+  //       email: userData.email,
+  //       avatar: userData.avatar,
+  //       phone: userData.phone,
+  //       address: userData.address,
+  //       city: userData.city,
+  //       state: userData.state,
+  //       country: userData.country,
+  //     });
+
+  //     setIsEditing(null);
+  //     setServerError(null);
+  //     setEditMode(false);
+  //   } catch (error) {
+  //     console.error("Error updating user:", error);
+  //   }
+  // };
+
+  const saveProfile = async () => {
     if (!user) return;
-    try {
-      if (isEditing === "name") {
-        await account.updateName(formData.name);
-      }
-      if (isEditing === "avatar") {
-        let avatarUrl = formData.avatar;
 
-        // If a file was selected, upload it to Appwrite Storage
-        if (avatarFile) {
-          try {
-            const fileId = ID.unique();
-            console.log("📤 Uploading avatar file...");
+    try{
+      await account.updateName(formData.name);
 
-            // Upload file to Appwrite Storage
-            await storage.createFile(config.storageId, fileId, avatarFile);
-
-            // Get public URL for the uploaded file
-            avatarUrl = `${config.endpoint}/storage/buckets/${config.storageId}/files/${fileId}/view?project=${config.projectId}`;
-
-            console.log("✅ Avatar uploaded:", avatarUrl);
-          } catch (uploadError) {
-            console.error("❌ Avatar upload error:", uploadError);
-            setServerError("Failed to upload avatar. Please try again.");
-            return;
-          }
-        }
-
-        // Update account preferences with the avatar URL
+      if (avatarFile){
+        const fileId = ID.unique();
+        console.log("📤 Uploading avatar file...");
+        await storage.createFile(config.storageId, fileId, avatarFile);
+        const avatarUrl = `${config.endpoint}/storage/buckets/${config.storageId}/files/${fileId}/view?project=${config.projectId}`;
         await account.updatePrefs({ avatar: avatarUrl });
       }
 
-      if (
-        isEditing === "phone" ||
-        isEditing === "address" ||
-        isEditing === "city" ||
-        isEditing === "state" ||
-        isEditing === "country"
-      ) {
-        const result = await updateUserProfile({
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          country: formData.country,
-        });
+      const result = await updateUserProfile({
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+      });
 
-        if (!result.success) {
-          setServerError(result.error);
-          return; // Stop here if update failed
-        }
+      if (!result.success){
+        setServerError(result.error);
+        return;
       }
 
       const updatedUser = await account.get();
@@ -456,15 +550,16 @@ const ProfileInfo = () => {
         state: userData.state,
         country: userData.country,
       });
-
-      setIsEditing(null);
+      setEditMode(false);
       setServerError(null);
-    } catch (error) {
-      console.error("Error updating user:", error);
+      
+    }catch(error){
+      console.error("Error saving profile:", error);
     }
-  };
+  }
 
   const handleCancel = () => {
+    setEditMode(false);
     // Reset form data
     setFormData({
       name: user.name,
@@ -486,401 +581,363 @@ const ProfileInfo = () => {
   if (!user) return null;
 
   return (
-    <div className="profile-info space-y-2">
-      <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "avatar" ? (
-          <div className="flex flex-col space-y-2">
-            <input
-              type="file"
-              accept="image/*"
-              className="border rounded px-2 py-1"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setAvatarFile(file);
-                  const previewURL = URL.createObjectURL(file);
-                  setAvatarPreview(previewURL);
-                }
-              }}
-            />
-            {avatarPreview && (
-              <div className="mt-2">
-                <img
-                  src={avatarPreview}
-                  alt="Avatar Preview"
-                  className="w-24 h-24 rounded-full object-cover border"
+    <div className="profile-info">
+      <div className="lg:flex lg:gap-8">
+        {/* LEFT COLUMN - Profile */}
+        <div className={`${user.applicationStatus || user.role === "seller" || isEditingSeller ? "lg:w-1/2" : "lg:w-full"} mb-8 lg:mb-0`}>
+          <h3 className="text-[20px] lg:text-[24px] font-bold font-poppins mb-6">
+            Profile
+          </h3>
+          
+          <div className="space-y-2">
+            {/* Avatar */}
+            <div className="flex items-center space-x-2 pb-3">
+              {editMode ? (
+                <div className="flex flex-col space-y-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="border rounded px-2 py-1"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setAvatarFile(file);
+                        const previewURL = URL.createObjectURL(file);
+                        setAvatarPreview(previewURL);
+                      }
+                    }}
+                  />
+                  {avatarPreview && (
+                    <div className="mt-2">
+                      <img
+                        src={avatarPreview}
+                        alt="Avatar Preview"
+                        className="w-24 h-24 rounded-full object-cover border"
+                      />
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="h-24 w-24 rounded-full object-cover border"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Name */}
+            <div className="flex items-center space-x-2 pb-3">
+              {editMode ? (
+                <input
+                  name="name"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
                 />
+              ) : (
+                <span className="text-[25px] font-semibold">{user.name}</span>
+              )}
+            </div>
+
+            {/* Email */}
+            <div className="flex items-center space-x-2 pb-3">
+              <span className="text-[25px] font-semibold">{user.email}</span>
+            </div>
+
+            {/* Phone */}
+            <div className="flex items-center space-x-2 pb-3">
+              {editMode ? (
+                <input
+                  name="phone"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user?.phone || "Enter Mobile Number"}
+                </span>
+              )}
+            </div>
+
+            {/* Address */}
+            <div className="flex items-center space-x-2 pb-3">
+              {editMode ? (
+                <input
+                  name="address"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user.address || "Enter Home Address"}
+                </span>
+              )}
+            </div>
+
+            {/* City */}
+            <div className="flex items-center space-x-2 pb-3">
+              {editMode ? (
+                <input
+                  name="city"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user.city || "Enter City"}
+                </span>
+              )}
+            </div>
+
+            {/* State */}
+            <div className="flex items-center space-x-2 pb-3">
+              {editMode ? (
+                <input
+                  name="state"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.state}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user.state || "Enter State"}
+                </span>
+              )}
+            </div>
+
+            {/* Edit/Save/Cancel Buttons */}
+            <div className="mt-5">
+              {editMode ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleSave()}
+                    className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                  >
+                    Save Profile
+                  </button>
+                  <button
+                    onClick={() => handleCancel()}
+                    className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
+
+            {/* Become a Seller Button - Only show if no seller data */}
+            {!user.applicationStatus && user.role !== "seller" && (
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h4 className="text-[18px] font-semibold mb-3">Want to sell on our platform?</h4>
+                <button
+                  onClick={() => setIsEditingSeller(true)}
+                  className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                >
+                  Become a Seller
+                </button>
               </div>
             )}
-            <div className="flex items-center space-x-2">
-              <button
-                className="text-green-600 hover:text-green-800"
-                onClick={handleSave}
-              >
-                <Check className="h-5 w-5" />
-              </button>
-              <button
-                className="text-red-600 hover:text-red-800"
-                onClick={handleCancel}
-              >
-                <X className="h-5 w-5" />
-              </button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN - Sellers Profile - Only show if user has seller data or is applying */}
+        {(user.applicationStatus || user.role === "seller" || isEditingSeller) && (
+          <div className="lg:w-1/2">
+            <h3 className="text-[20px] lg:text-[24px] font-bold font-poppins mb-6">
+              Sellers Profile
+            </h3>
+
+            <div className="space-y-2">
+          
+
+            {/* Shop Name */}
+            <div className="flex items-center space-x-2 pb-3">
+              {isEditingSeller ? (
+                <input
+                  name="shopName"
+                  placeholder="Shop Name"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.shopName || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user?.shopName || "Not Set"}
+                </span>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="h-[40px] w-[40px] rounded-full"
-            />
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("avatar")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </div>
-        )}
-      </div>
-      <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "name" ? (
-          <>
-            <input
-              name="name"
-              className="border rounded px-2 py-2 text-[20px]"
-              value={formData.name}
-              // onChange={(e) => setNameInput(e.target.value)}
-              onChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-            />
-            <button
-              className="text-green-600 hover:text-green-800"
-              onClick={handleSave}
-            >
-              <Check className="h-5 w-5" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-800"
-              onClick={handleCancel}
-            >
-              <X className="h-2 lg:h-5 w-2 lg:w-5" />
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="text-[25px] font-semibold">{user.name}</span>
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("name")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </>
-        )}
-      </div>
 
-      <div className="flex items-center space-x-2 pb-3">
-        <span className="text-[25px] font-semibold">{user.email}</span>
-      </div>
-      {/* PHONE */}
-      <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "phone" ? (
-          <>
-            <input
-              name="phone"
-              className="border rounded px-2 py-2 text-[20px]"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-            />
-            <button
-              className="text-green-600 hover:text-green-800"
-              onClick={handleSave}
-            >
-              <Check className="h-5 w-5" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-800"
-              onClick={handleCancel}
-            >
-              <X className="h-2 lg:h-5 w-2 lg:w-5" />
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="text-[25px] font-semibold">
-              {user?.phone || "Enter Mobile Number"}
-            </span>
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("phone")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </>
-        )}
-      </div>
+            {/* Shop URL */}
+            <div className="flex items-center space-x-2 pb-3">
+              {isEditingSeller ? (
+                <input
+                  name="shopUrl"
+                  placeholder="Shop URL"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.shopUrl || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user?.shopUrl || "Not Set"}
+                </span>
+              )}
+            </div>
 
-      {/* PHONE end */}
-      {/* Address */}
-      <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "address" ? (
-          <>
-            <input
-              name="address"
-              className="border rounded px-2 py-2 text-[20px]"
-              value={formData.address}
-              onChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-            />
-            <button
-              className="text-green-600 hover:text-green-800"
-              onClick={handleSave}
-            >
-              <Check className="h-5 w-5" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-800"
-              onClick={handleCancel}
-            >
-              <X className="h-2 lg:h-5 w-2 lg:w-5" />
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="text-[25px] font-semibold">
-              {user.address || "Enter Home Address"}
-            </span>
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("address")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </>
-        )}
-      </div>
+            {/* Contact Email */}
+            <div className="flex items-center space-x-2 pb-3">
+              {isEditingSeller ? (
+                <input
+                  name="contactEmail"
+                  type="email"
+                  placeholder="Contact Email"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.contactEmail || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user?.contactEmail || "Not Set"}
+                </span>
+              )}
+            </div>
 
-      {/* City */}
-      <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "city" ? (
-          <>
-            <input
-              name="city"
-              className="border rounded px-2 py-2 text-[20px]"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-            />
-            <button
-              className="text-green-600 hover:text-green-800"
-              onClick={handleSave}
-            >
-              <Check className="h-5 w-5" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-800"
-              onClick={handleCancel}
-            >
-              <X className="h-2 lg:h-5 w-2 lg:w-5" />
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="text-[25px] font-semibold">
-              {user.city || "Enter City"}
-            </span>
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("city")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </>
-        )}
-      </div>
+            {/* Contact Phone */}
+            <div className="flex items-center space-x-2 pb-3">
+              {isEditingSeller ? (
+                <input
+                  name="contactPhone"
+                  type="tel"
+                  placeholder="Contact Phone"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.contactPhone || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user?.contactPhone || "Not Set"}
+                </span>
+              )}
+            </div>
 
-      {/* City */}
-      <div className="flex items-center space-x-2 pb-3">
-        {isEditing === "state" ? (
-          <>
-            <input
-              name="state"
-              className="border rounded px-2 py-2 text-[20px]"
-              value={formData.state}
-              onChange={(e) =>
-                setFormData({ ...formData, [e.target.name]: e.target.value })
-              }
-            />
-            <button
-              className="text-green-600 hover:text-green-800"
-              onClick={handleSave}
-            >
-              <Check className="h-5 w-5" />
-            </button>
-            <button
-              className="text-red-600 hover:text-red-800"
-              onClick={handleCancel}
-            >
-              <X className="h-2 lg:h-5 w-2 lg:w-5" />
-            </button>
-          </>
-        ) : (
-          <>
-            <span className="text-[25px] font-semibold">
-              {user.state || "Enter State"}
-            </span>
-            <button
-              className="text-gray-500 hover:text-gray-700"
-              onClick={() => setIsEditing("state")}
-            >
-              <PencilIcon className="h-3 w-3" />
-            </button>
-          </>
-        )}
-      </div>
+            {/* Shop Address */}
+            <div className="flex items-center space-x-2 pb-3">
+              {isEditingSeller ? (
+                <input
+                  name="shopAddress"
+                  placeholder="Shop Address"
+                  className="border rounded px-2 py-2 text-[20px] w-full"
+                  value={formData.shopAddress || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [e.target.name]: e.target.value })
+                  }
+                />
+              ) : (
+                <span className="text-[25px] font-semibold">
+                  {user?.shopAddress || "Not Set"}
+                </span>
+              )}
+            </div>
 
-      {showSellerForm && (
-        <div className="mt-5 border p-5 rounded">
-          <h3>Seller Application Form</h3>
+            {/* Edit/Save/Cancel Buttons */}
+            <div className="mt-5">
+              {isEditingSeller ? (
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      handleSellerSubmit();
+                      setIsEditingSeller(false);
+                    }}
+                    className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                  >
+                    Save Seller Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingSeller(false);
+                      // Reset form data
+                      setFormData({
+                        ...formData,
+                        shopName: user?.shopName || "",
+                        shopUrl: user?.shopUrl || "",
+                        contactEmail: user?.contactEmail || "",
+                        contactPhone: user?.contactPhone || "",
+                        shopAddress: user?.shopAddress || "",
+                      });
+                    }}
+                    className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setIsEditingSeller(true)}
+                  className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
+                >
+                  {user.applicationStatus ? "Edit Seller Profile" : "Become a Seller"}
+                </button>
+              )}
+            </div>
 
-          {/* Shop Name Input */}
-          <input
-            name="shopName"
-            placeholder="Shop Name"
-            value={formData.shopName}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            className="border rounded px-2 py-2 w-full mb-2"
-          />
-
-          {/* Shop URL Input */}
-          <input
-            name="shopUrl"
-            placeholder="Shop URL"
-            value={formData.shopUrl || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            className="border rounded px-2 py-2 w-full mb-2"
-          />
-
-          {/* Contact Email Input */}
-          <input
-            name="contactEmail"
-            type="email"
-            placeholder="Contact Email"
-            value={formData.contactEmail || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            className="border rounded px-2 py-2 w-full mb-2"
-          />
-
-          {/* Contact Phone Input */}
-          <input
-            name="contactPhone"
-            type="tel"
-            placeholder="Contact Phone"
-            value={formData.contactPhone || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            className="border rounded px-2 py-2 w-full mb-2"
-          />
-
-          {/* Shop Address Input */}
-          <input
-            name="shopAddress"
-            placeholder="Shop Address"
-            value={formData.shopAddress || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            className="border rounded px-2 py-2 w-full mb-2"
-          />
-
-          {/* City Input */}
-          <input
-            name="city"
-            placeholder="City"
-            value={formData.city || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, [e.target.name]: e.target.value })
-            }
-            className="border rounded px-2 py-2 w-full mb-2"
-          />
-
-          {/* Submit and Cancel Buttons */}
-          <div className="flex gap-3 mt-4">
-            <button
-              onClick={handleSellerSubmit}
-              className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
-            >
-              Submit Application
-            </button>
-            <button
-              onClick={() => setShowSellerForm(false)}
-              className="bg-gray-400 text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-500 transition duration-300"
-            >
-              Cancel
-            </button>
+              {/* Application Status */}
+              {user.applicationStatus && (
+              <div className="pb-3">
+                <div className="flex items-center gap-2">
+                  <p className="text-lg font-semibold">Application Status:</p>
+                  <span className="capitalize flex items-center gap-1">
+                    {user.applicationStatus === "approved" && (
+                      <Check className="h-5 w-5 text-green-600" />
+                    )}
+                    {user.applicationStatus === "rejected" && (
+                      <X className="h-5 w-5 text-red-600" />
+                    )}
+                    {user.applicationStatus === "pending" && (
+                      <Minus className="h-5 w-5 text-yellow-600" />
+                    )}
+                    {user.applicationStatus}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+        )}
+      </div>
 
-      {/* application status display */}
-      {user.applicationStatus && (
-        <div className="mt-5">
-          <p className="text-lg font-semibold">
-            Application Status:{" "}
-            <span className="capitalize">{user.applicationStatus}</span>
-          </p>
-        </div>
-      )}
-
-      {/* Become a Seller Button - Only show if no application and form is not open */}
-      {!showSellerForm && !user.applicationStatus && (
-        <div className="mt-5">
-          <button
-            onClick={() => setShowSellerForm(true)}
-            className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
-          >
-            Become a seller
-          </button>
-        </div>
-      )}
-      {/* Pending Button - Disabled, shows when application is pending */}
-      {!showSellerForm && user.applicationStatus === "pending" && (
-        <div className="mt-5">
-          <button
-            disabled
-            className="bg-gray-400 text-white px-[20px] lg:px-[40px] py-[15px] font-semibold cursor-not-allowed"
-          >
-            Pending Approval
-          </button>
-        </div>
-      )}
-
-      {/* Update Seller Profile Button - Only if approved */}
-      {!showSellerForm && user.applicationStatus === "approved" && (
-        <div className="mt-5">
-          <button
-            onClick={() => setShowSellerForm(true)}
-            className="bg-black text-white px-[20px] lg:px-[40px] py-[15px] font-semibold hover:bg-gray-600 transition duration-300"
-          >
-            Update Seller Profile
-          </button>
-        </div>
-      )}
-
-      {serverError && <p className="text-red-500">{serverError}</p>}
+      {/* Error Message - Outside Both Columns */}
+      {serverError && <p className="text-red-500 mt-5">{serverError}</p>}
     </div>
   );
 };

@@ -14,7 +14,9 @@ import Footer from "./components/Footer/Footer";
 import Spinner from "@/components/UI/spinner.jsx";
 import AuthRoute from "./components/Utils/AuthRoute.jsx";
 import Checkout from "./components/Checkout/Checkout";
-// import OnSale from "./components/Sale/OnSale.jsx";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { Toaster } from "react-hot-toast";
 
 // Lazy load routes - only load when needed (reduces initial bundle size)
 const ProductDetail = lazy(() => import("./components/Detail/ProductDetail"));
@@ -33,6 +35,8 @@ function ScrollToTop() {
 
   return null;
 }
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 function App() {
   const dispatch = useDispatch();
@@ -72,7 +76,7 @@ function App() {
         loadUserFromStorage({
           user: JSON.parse(savedUser),
           token: savedToken,
-        })
+        }),
       );
     }
   }, [dispatch]);
@@ -106,6 +110,35 @@ function App() {
 
   return (
     <div>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#000",
+            color: "#fff",
+            fontFamily: "Poppins, sans-serif",
+            fontSize: "14px",
+            padding: "12px 20px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+          },
+          success: {
+            style: {
+              background: "#000",
+              border: "2px solid #10b981",
+            },
+          },
+          error: {
+            style: {
+              background: "#000",
+              border: "2px solid #ef4444",
+            },
+          },
+        }}
+      />
       <Router>
         <ScrollToTop />
         <Header />
@@ -137,7 +170,14 @@ function App() {
                 }
               />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route
+                path="/checkout"
+                element={
+                  <Elements stripe={stripePromise}>
+                    <Checkout />
+                  </Elements>
+                }
+              />
             </Routes>
           </Suspense>
         </div>

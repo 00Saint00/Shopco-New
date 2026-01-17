@@ -5,6 +5,8 @@ import ShippingAddress from "./ShippingAddress";
 import { useDispatch } from "react-redux";
 import { createOrder } from "../../services/orderService";
 import { clearCart } from "../../store/slices/cartSlice";
+import toast from 'react-hot-toast';
+import Payment from "./Payment";
 
 const Checkout = () => {
   const cart = useSelector((state) => state.cart.cart);
@@ -15,39 +17,43 @@ const Checkout = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState(null);
 
-  const handlePlaceOrder = async () => {
+
+     // Prepare shipping address object
+     const shippingAddress = {
+      fullName: user?.name || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      address: user?.address|| "",
+      city: user?.city || "",
+      state: user?.state || "",
+      zip: user?.zip || "",
+      country: user?.country || "",
+    };
+
+
+  const handlePlaceOrder = async (paymentId) => {
     if (cart.length === 0) {
-      alert("Your cart is empty!");
+      // alert("Your cart is empty!");
+      toast.error("Your cart is empty!");
       return;
     }
 
     // Check if user has address (handle empty strings too)
-    const hasAddress = user?.address && user.address.trim() !== "";
-    const hasCity = user?.city && user.city.trim() !== "";
-    const hasState = user?.state && user.state.trim() !== "";
+    // const hasAddress = user?.address && user.address.trim() !== "";
+    // const hasCity = user?.city && user.city.trim() !== "";
+    // const hasState = user?.state && user.state.trim() !== "";
 
-    if (!hasAddress || !hasCity || !hasState) {
-      alert(
-        "Please complete your shipping address first! Click 'Edit Address' to add your address details."
-      );
-      return;
-    }
+    // if (!hasAddress || !hasCity || !hasState) {
+    //   alert(
+    //     "Please complete your shipping address first! Click 'Edit Address' to add your address details."
+    //   );
+    //   return;
+    // }
 
     setIsPlacingOrder(true);
     setOrderError(null);
 
-    // Prepare shipping address object
-    const shippingAddress = {
-      fullName: user.name || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      address: user.address || "",
-      city: user.city || "",
-      state: user.state || "",
-      zip: user.zip || "",
-      country: user.country || "",
-    };
-
+ 
     // Create order
     const result = await createOrder({
       items: cart,
@@ -60,13 +66,16 @@ const Checkout = () => {
       dispatch(clearCart());
 
       // Show success message
-      alert(`Order placed successfully! Order #: ${result.orderNumber}`);
+      // alert(`Order placed successfully! Order #: ${result.orderNumber}`);
 
+      toast.success(`Order placed successfully! Order #: ${result.orderNumber}`);
+      
       // Redirect to home or orders page
       navigate("/");
     } else {
       setOrderError(result.error || "Failed to place order");
-      alert("Failed to place order. Please try again.");
+      // alert("Failed to place order. Please try again.");
+      toast.error("Failed to place order. Please try again.");
     }
 
     setIsPlacingOrder(false);
@@ -125,13 +134,20 @@ const Checkout = () => {
               </div>
               {/* place order */}
               <div className="pt-6 mt-4">
-                <button
+                {/* <button
                   onClick={handlePlaceOrder}
                   disabled={isPlacingOrder || cart.length === 0}
                   className="w-full bg-black text-white py-[15px] rounded-[62px] font-semibold hover:bg-gray-600 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {isPlacingOrder ? "Placing Order..." : "Place Order"}
-                </button>
+                </button> */}
+                <Payment
+  total={total}
+  items={cart}
+  shippingAddress={shippingAddress}
+  onSuccess={handlePlaceOrder}
+  onError={setOrderError}
+/>
                 {orderError && (
                   <p className="text-red-500 text-sm mt-2 text-center">
                     {orderError}

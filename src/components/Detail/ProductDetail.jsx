@@ -10,6 +10,7 @@ import ProductTab from "./ProductTab";
 // import { addToCart } from "../Utils/CartUtils";
 import { applyDailyDiscounts } from "../Utils/discountUtils";
 import { useDispatch } from "react-redux";
+import toast from 'react-hot-toast';
 import { addToCart } from "../../store/slices/cartSlice";
 
 function ProductDetail() {
@@ -282,7 +283,8 @@ function ProductDetail() {
                       category: product.category,
                     })
                   );
-                  alert("Item added to cart!");
+                  // alert("Item added to cart!");
+                  toast.success("Item added to cart!");
                 }}
               >
                 Add to Cart
